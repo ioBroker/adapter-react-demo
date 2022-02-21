@@ -7,64 +7,63 @@
 import React, { Component, createRef } from 'react';
 import PropTypes from 'prop-types';
 import copy from './copy-to-clipboard';
-import withStyles from '@material-ui/core/styles/withStyles';
+import withStyles from '@mui/styles/withStyles';
 import SVG from 'react-inlinesvg';
 
-import IconButton from '@material-ui/core/IconButton';
-import withWidth from '@material-ui/core/withWidth';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import FormControl from '@material-ui/core/FormControl';
-import Input from '@material-ui/core/Input';
-import Grid from '@material-ui/core/Grid';
-import Badge from '@material-ui/core/Badge';
-import Tooltip from '@material-ui/core/Tooltip';
-import Snackbar from '@material-ui/core/Snackbar';
-import Checkbox from '@material-ui/core/Checkbox';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
-import Button from '@material-ui/core/Button';
-import Fab from '@material-ui/core/Fab';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import Slider from '@material-ui/core/Slider';
-import Typography from '@material-ui/core/Typography';
+import IconButton from '@mui/material/IconButton';
+import CircularProgress from '@mui/material/CircularProgress';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import Input from '@mui/material/Input';
+import Grid from '@mui/material/Grid';
+import Badge from '@mui/material/Badge';
+import Tooltip from '@mui/material/Tooltip';
+import Snackbar from '@mui/material/Snackbar';
+import Checkbox from '@mui/material/Checkbox';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import ListItemText from '@mui/material/ListItemText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import Slider from '@mui/material/Slider';
+import Typography from '@mui/material/Typography';
 
 // Icons
-import IconEdit from '@material-ui/icons/Edit';
-import IconDelete from '@material-ui/icons/Delete';
-import IconConfig from '@material-ui/icons/Settings';
-import IconSystem from '@material-ui/icons/SettingsApplications';
-import IconPhoto from '@material-ui/icons/Photo';
-import IconGroup from '@material-ui/icons/SupervisedUserCircle';
-import IconSchedule from '@material-ui/icons/CalendarToday';
-import IconUser from '@material-ui/icons/PersonOutlined';
-import IconHost from '@material-ui/icons/Router';
-import IconConnection from '@material-ui/icons/Wifi';
-import IconInfo from '@material-ui/icons/Info';
-import IconMeta from '@material-ui/icons/Description';
-import IconScript from '@material-ui/icons/Code';
-import IconChart from '@material-ui/icons/ShowChart';
-import IconEnum from '@material-ui/icons/ListAlt';
-import IconColumns from '@material-ui/icons/ViewColumn';
-import IconClose from '@material-ui/icons/Close';
-import IconCheck from '@material-ui/icons/Check';
-import BuildIcon from '@material-ui/icons/Build';
-import PublishIcon from '@material-ui/icons/Publish';
-import AddIcon from '@material-ui/icons/Add';
-import RefreshIcon from '@material-ui/icons/Refresh';
-import LooksOneIcon from '@material-ui/icons/LooksOne';
-import PressButtonIcon from '@material-ui/icons/RoomService';
+import IconEdit from '@mui/icons-material/Edit';
+import IconDelete from '@mui/icons-material/Delete';
+import IconConfig from '@mui/icons-material/Settings';
+import IconSystem from '@mui/icons-material/SettingsApplications';
+import IconPhoto from '@mui/icons-material/Photo';
+import IconGroup from '@mui/icons-material/SupervisedUserCircle';
+import IconSchedule from '@mui/icons-material/CalendarToday';
+import IconUser from '@mui/icons-material/PersonOutlined';
+import IconHost from '@mui/icons-material/Router';
+import IconConnection from '@mui/icons-material/Wifi';
+import IconInfo from '@mui/icons-material/Info';
+import IconMeta from '@mui/icons-material/Description';
+import IconScript from '@mui/icons-material/Code';
+import IconChart from '@mui/icons-material/ShowChart';
+import IconEnum from '@mui/icons-material/ListAlt';
+import IconColumns from '@mui/icons-material/ViewColumn';
+import IconClose from '@mui/icons-material/Close';
+import IconCheck from '@mui/icons-material/Check';
+import BuildIcon from '@mui/icons-material/Build';
+import PublishIcon from '@mui/icons-material/Publish';
+import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import LooksOneIcon from '@mui/icons-material/LooksOne';
+import PressButtonIcon from '@mui/icons-material/RoomService';
 
 import IconExpert from '../icons/IconExpert';
 import IconAdapter from '../icons/IconAdapter';
@@ -85,6 +84,9 @@ import Utils from './Utils';
 import TabContainer from './TabContainer';
 import TabContent from './TabContent';
 import TabHeader from './TabHeader';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const ICON_SIZE = 24;
 const ROW_HEIGHT = 32;
@@ -186,7 +188,7 @@ const styles = theme => ({
     tableDiv: {
         paddingTop: 0,//theme.spacing(1),
         paddingLeft: 0,
-        width: `calc(100% - ${theme.spacing(1)}px)`,
+        width: `calc(100% - ${theme.spacing(1)})`,
         height: `calc(100% - 38px)`,
         overflow: 'auto'
     },
@@ -205,7 +207,7 @@ const styles = theme => ({
         flexWrap: 'nowrap',
     },
     tableRowLines: {
-        borderBottom: `1px solid ${theme.palette.type === 'dark' ? '#8888882e' : '#8888882e'}`,
+        borderBottom: `1px solid ${theme.palette.mode === 'dark' ? '#8888882e' : '#8888882e'}`,
     },
     tableRowNoDragging: {
         cursor: 'pointer',
@@ -308,7 +310,7 @@ const styles = theme => ({
         fontSize: 12,
         opacity: 0.7,
         '&:hover': {
-            color: theme.palette.type === 'dark' ? '#009900' : '#007700',
+            color: theme.palette.mode === 'dark' ? '#009900' : '#007700',
         }
     },
     cellIdAliasReadWriteDiv: {
@@ -429,7 +431,7 @@ const styles = theme => ({
             color: '#008000',
         },
         '100%': {
-            color: theme.palette.type === 'dark' ? '#fff' : '#000',
+            color: theme.palette.mode === 'dark' ? '#fff' : '#000',
         }
     },
     cellValueTextState: {
@@ -513,7 +515,7 @@ const styles = theme => ({
         opacity: 0.5,
     },
     itemSelected: {
-        background: `${theme.palette.type === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark} !important`,
+        background: `${theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark} !important`,
         color: `${Utils.invertColor(theme.palette.primary.main, true)} !important`,
     },
     header: {
@@ -2774,7 +2776,7 @@ class ObjectBrowser extends Component {
                 }
                 try {
                     await this.props.socket.setObject(id, obj);
-                    enums && await this._createAllEnums(enums, obj._id);
+                    enums && (await this._createAllEnums(enums, obj._id));
                     if (obj.type === 'state') {
                         try {
                             const state = await this.props.socket.getState(obj._id);
@@ -3002,153 +3004,160 @@ class ObjectBrowser extends Component {
             }
         }
 
-        return <div style={{
-            display: 'flex',
-            width: '100%',
-            alignItems: 'center'
-        }}>
+        return (
             <div style={{
                 display: 'flex',
                 width: '100%',
                 alignItems: 'center'
             }}>
+                <div style={{
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center'
+                }}>
 
-                <Tooltip title={this.props.t('ra_Refresh tree')}>
-                    <div>
-                        <IconButton onClick={() => this.refreshComponent()} disabled={this.state.updating}>
-                            <RefreshIcon />
-                        </IconButton>
-                    </div>
-                </Tooltip>
-                {this.props.showExpertButton &&
-                <Tooltip title={this.props.t('ra_expertMode')}>
-                    <IconButton
-                        key="expertMode"
-                        color={this.state.filter.expertMode ? 'secondary' : 'default'}
-                        onClick={() => this.onFilter('expertMode', !this.state.filter.expertMode)}
-                    >
-                        <IconExpert />
-                    </IconButton>
-                </Tooltip>
-                }
-                {!this.props.disableColumnSelector &&
-                <Tooltip title={this.props.t('ra_Configure visible columns')}>
-                    <IconButton
-                        key="columnSelector"
-                        color={this.state.columnsAuto ? 'primary' : 'default'}
-                        onClick={() => this.setState({ columnsSelectorShow: true })}
-                    >
-                        <IconColumns />
-                    </IconButton>
-                </Tooltip>
-                }
-                {this.state.expandAllVisible &&
-                <Tooltip title={this.props.t('ra_Expand all nodes')}>
-                    <IconButton
-                        key="expandAll"
-                        onClick={() => this.onExpandAll()}
-                    >
-                        <IconOpen />
-                    </IconButton>
-                </Tooltip>
-                }
-                <Tooltip title={this.props.t('ra_Collapse all nodes')}>
-                    <IconButton
-                        key="collapseAll"
-                        onClick={() => this.onCollapseAll()}
-                    >
-                        <IconClosed />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title={this.props.t('ra_Expand one step node')}>
-                    <IconButton
-                        key="expandVisible"
-                        color="primary"
-                        onClick={() => this.onExpandVisible()}
-                    >
-                        <StyledBadge badgeContent={this.state.depth} color="secondary">
-                            <IconOpen />
-                        </StyledBadge>
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title={this.props.t('ra_Collapse one step node')}>
-                    <IconButton
-                        key="collapseVisible"
-                        color="primary"
-                        onClick={() => this.onCollapseVisible()}
-                    >
-                        <StyledBadge badgeContent={this.state.depth} color="secondary">
-                            <IconClosed />
-                        </StyledBadge>
-                    </IconButton>
-                </Tooltip>
-                {this.props.objectStatesView && <Tooltip title={this.props.t('ra_Toggle the states view')}>
-                    <IconButton onClick={() => this.onStatesViewVisible()}>
-                        <LooksOneIcon color={this.state.statesView ? 'primary' : 'inherit'} />
-                    </IconButton>
-                </Tooltip>}
-
-                {this.props.objectAddBoolean ?
-                    <Tooltip title={this.toolTipObjectCreating()}>
+                    <Tooltip title={this.props.t('ra_Refresh tree')}>
                         <div>
-                            <IconButton disabled={!allowObjectCreation} onClick={() =>
-                                this.setState({ modalNewObj: true })}
-                            >
-                                <AddIcon />
+                            <IconButton
+                                onClick={() => this.refreshComponent()}
+                                disabled={this.state.updating}
+                                size="large">
+                                <RefreshIcon />
                             </IconButton>
                         </div>
                     </Tooltip>
-                    : null
-                }
+                    {this.props.showExpertButton &&
+                    <Tooltip title={this.props.t('ra_expertMode')}>
+                        <IconButton
+                            key="expertMode"
+                            color={this.state.filter.expertMode ? 'secondary' : 'default'}
+                            onClick={() => this.onFilter('expertMode', !this.state.filter.expertMode)}
+                            size="large">
+                            <IconExpert />
+                        </IconButton>
+                    </Tooltip>
+                    }
+                    {!this.props.disableColumnSelector &&
+                    <Tooltip title={this.props.t('ra_Configure visible columns')}>
+                        <IconButton
+                            key="columnSelector"
+                            color={this.state.columnsAuto ? 'primary' : 'default'}
+                            onClick={() => this.setState({ columnsSelectorShow: true })}
+                            size="large">
+                            <IconColumns />
+                        </IconButton>
+                    </Tooltip>
+                    }
+                    {this.state.expandAllVisible &&
+                    <Tooltip title={this.props.t('ra_Expand all nodes')}>
+                        <IconButton key="expandAll" onClick={() => this.onExpandAll()} size="large">
+                            <IconOpen />
+                        </IconButton>
+                    </Tooltip>
+                    }
+                    <Tooltip title={this.props.t('ra_Collapse all nodes')}>
+                        <IconButton key="collapseAll" onClick={() => this.onCollapseAll()} size="large">
+                            <IconClosed />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={this.props.t('ra_Expand one step node')}>
+                        <IconButton
+                            key="expandVisible"
+                            color="primary"
+                            onClick={() => this.onExpandVisible()}
+                            size="large">
+                            <StyledBadge badgeContent={this.state.depth} color="secondary">
+                                <IconOpen />
+                            </StyledBadge>
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={this.props.t('ra_Collapse one step node')}>
+                        <IconButton
+                            key="collapseVisible"
+                            color="primary"
+                            onClick={() => this.onCollapseVisible()}
+                            size="large">
+                            <StyledBadge badgeContent={this.state.depth} color="secondary">
+                                <IconClosed />
+                            </StyledBadge>
+                        </IconButton>
+                    </Tooltip>
+                    {this.props.objectStatesView && <Tooltip title={this.props.t('ra_Toggle the states view')}>
+                        <IconButton onClick={() => this.onStatesViewVisible()} size="large">
+                            <LooksOneIcon color={this.state.statesView ? 'primary' : 'inherit'} />
+                        </IconButton>
+                    </Tooltip>}
 
-                {this.props.objectImportExport &&
-                <Tooltip title={this.props.t('ra_Add objects tree from JSON file')}>
-                    <IconButton onClick={() => {
-                        const input = document.createElement('input');
-                        input.setAttribute('type', 'file');
-                        input.setAttribute('id', 'files');
-                        input.setAttribute('opacity', 0);
-                        input.addEventListener('change', e => this.handleJsonUpload(e), false);
-                        input.click();
-                    }}>
-                        <PublishIcon />
-                    </IconButton>
-                </Tooltip>
-                }
-                {this.props.objectImportExport && (!!this.state.selected.length || this.state.selectedNonObject) &&
-                <Tooltip title={this.props.t('ra_Save objects tree as JSON file')}>
-                    <IconButton onClick={() => this.setState({showExportDialog: this._getSelectedIdsForExport().length})}>
-                        <PublishIcon style={{ transform: 'rotate(180deg)' }} />
+                    {this.props.objectAddBoolean ?
+                        <Tooltip title={this.toolTipObjectCreating()}>
+                            <div>
+                                <IconButton
+                                    disabled={!allowObjectCreation}
+                                    onClick={() =>
+                                        this.setState({ modalNewObj: true })}
+                                    size="large">
+                                    <AddIcon />
+                                </IconButton>
+                            </div>
+                        </Tooltip>
+                        : null
+                    }
+
+                    {this.props.objectImportExport &&
+                    <Tooltip title={this.props.t('ra_Add objects tree from JSON file')}>
+                        <IconButton
+                            onClick={() => {
+                                const input = document.createElement('input');
+                                input.setAttribute('type', 'file');
+                                input.setAttribute('id', 'files');
+                                input.setAttribute('opacity', 0);
+                                input.addEventListener('change', e => this.handleJsonUpload(e), false);
+                                input.click();
+                            }}
+                            size="large">
+                            <PublishIcon />
+                        </IconButton>
+                    </Tooltip>
+                    }
+                    {this.props.objectImportExport && (!!this.state.selected.length || this.state.selectedNonObject) &&
+                    <Tooltip title={this.props.t('ra_Save objects tree as JSON file')}>
+                        <IconButton
+                            onClick={() => this.setState({showExportDialog: this._getSelectedIdsForExport().length})}
+                            size="large">
+                            <PublishIcon style={{ transform: 'rotate(180deg)' }} />
+                        </IconButton>
+                    </Tooltip>
+                    }
+                </div>
+                {!!this.props.objectBrowserEditObject && <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
+                    {`${this.props.t('ra_Objects')}: ${Object.keys(this.info.objects).length}, ${this.props.t('ra_States')}: ${Object.keys(this.info.objects).filter(el => this.info.objects[el].type === 'state').length}`}
+                </div>}
+                {this.props.objectEditBoolean &&
+                <Tooltip title={this.props.t('ra_Edit custom config')}>
+                    <IconButton
+                        onClick={() => {
+                            // get all visible states
+                            const ids = getVisibleItems(this.root, 'state', this.objects);
+
+                            if (ids.length) {
+                                this.pauseSubscribe(true);
+
+                                if (ids.length === 1) {
+                                    window.localStorage.setItem((this.props.dialogName || 'App') + '.objectSelected', this.state.selected[0]);
+                                    this.props.router && this.props.router.doNavigate(null, 'custom', this.state.selected[0]);
+                                }
+                                this.setState({ customDialog: ids });
+                            } else {
+                                this.setState({ toast: this.props.t('ra_please select object') });
+                            }
+                        }}
+                        size="large">
+                        <BuildIcon />
                     </IconButton>
                 </Tooltip>
                 }
             </div>
-            {!!this.props.objectBrowserEditObject && <div style={{ display: 'flex', whiteSpace: 'nowrap' }}>
-                {`${this.props.t('ra_Objects')}: ${Object.keys(this.info.objects).length}, ${this.props.t('ra_States')}: ${Object.keys(this.info.objects).filter(el => this.info.objects[el].type === 'state').length}`}
-            </div>}
-            {this.props.objectEditBoolean &&
-            <Tooltip title={this.props.t('ra_Edit custom config')}>
-                <IconButton onClick={() => {
-                    // get all visible states
-                    const ids = getVisibleItems(this.root, 'state', this.objects);
-
-                    if (ids.length) {
-                        this.pauseSubscribe(true);
-
-                        if (ids.length === 1) {
-                            window.localStorage.setItem((this.props.dialogName || 'App') + '.objectSelected', this.state.selected[0]);
-                            this.props.router && this.props.router.doNavigate(null, 'custom', this.state.selected[0]);
-                        }
-                        this.setState({ customDialog: ids });
-                    } else {
-                        this.setState({ toast: this.props.t('ra_please select object') });
-                    }
-                }}>
-                    <BuildIcon />
-                </IconButton>
-            </Tooltip>
-            }
-        </div>;
+        );
     }
 
     /**
@@ -3233,7 +3242,7 @@ class ObjectBrowser extends Component {
                     className={Utils.clsx(classes.cellButtonsButton, classes.cellButtonsEmptyButton, classes.cellButtonMinWidth)}
                     onClick={() =>
                         this.setState({ modalEditOfAccess: true, modalEmptyId: id, modalEditOfAccessObjData: item.data })}
-                >---</IconButton> : null}
+                    size="large">---</IconButton> : null}
                 {this.props.onObjectDelete && item.children && item.children.length ? <IconButton
                     className={Utils.clsx(classes.cellButtonsButton, classes.cellButtonsButtonAlone)}
                     size="small"
@@ -3252,9 +3261,11 @@ class ObjectBrowser extends Component {
         const aclSystemConfig = item.data.obj.acl && (item.data.obj.type === 'state' ? this.systemConfig.common.defaultNewAcl.state : this.systemConfig.common.defaultNewAcl.object);
 
         return [
-            this.props.expertMode && this.props.objectEditOfAccessControl ? <Tooltip key="acl" title={item.data.aclTooltip}><IconButton className={classes.cellButtonMinWidth} onClick={() =>
-                this.setState({ modalEditOfAccess: true, modalEditOfAccessObjData: item.data })}
-            >
+            this.props.expertMode && this.props.objectEditOfAccessControl ? <Tooltip key="acl" title={item.data.aclTooltip}><IconButton
+                className={classes.cellButtonMinWidth}
+                onClick={() =>
+                    this.setState({ modalEditOfAccess: true, modalEditOfAccessObjData: item.data })}
+                size="large">
                 <div className={classes.aclText}>{isNaN(Number(acl).toString(16)) ? Number(aclSystemConfig).toString(16) : Number(acl).toString(16)}</div>
             </IconButton></Tooltip> : <div key="aclEmpty" className={classes.cellButtonMinWidth} />,
             <IconButton
@@ -4300,7 +4311,11 @@ class ObjectBrowser extends Component {
 
         let filterClearInValue = null;
         if (!this.columnsVisibility.buttons && !this.isFilterEmpty()) {
-            filterClearInValue = <IconButton onClick={() => this.clearFilter()} className={classes.buttonClearFilter} title={this.props.t('ra_Clear filter')}>
+            filterClearInValue = <IconButton
+                onClick={() => this.clearFilter()}
+                className={classes.buttonClearFilter}
+                title={this.props.t('ra_Clear filter')}
+                size="large">
                 <IconClearFilter />
                 <IconClose className={classes.buttonClearFilterIcon} />
             </IconButton>;

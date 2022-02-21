@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 
-import Input from '@material-ui/core/Input';
-import Radio from '@material-ui/core/Radio';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormGroup from '@material-ui/core/FormGroup';
-import Checkbox from '@material-ui/core/Checkbox';
+import Input from '@mui/material/Input';
+import Radio from '@mui/material/Radio';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
+import Checkbox from '@mui/material/Checkbox';
 import MaskedInput from 'react-text-mask';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import TextField from '@material-ui/core/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
 
 import I18n from '../i18n';
 
@@ -74,34 +74,34 @@ const styles = theme => ({
     rowOnce: {},
 
     rowDays: {
-        background: theme.palette.type !== 'dark' ? '#ddeaff' : '#4b5057'
+        background: theme.palette.mode !== 'dark' ? '#ddeaff' : '#4b5057'
     },
     rowDows: {
-        background: theme.palette.type !== 'dark' ? '#DDFFDD' : '#52646c'
+        background: theme.palette.mode !== 'dark' ? '#DDFFDD' : '#52646c'
     },
     rowDates: {
-        background: theme.palette.type !== 'dark' ? '#DDDDFF' : '#747a86'
+        background: theme.palette.mode !== 'dark' ? '#DDDDFF' : '#747a86'
     },
     rowWeeks: {
-        background: theme.palette.type !== 'dark' ? '#DDDDFF' : '#717680'
+        background: theme.palette.mode !== 'dark' ? '#DDDDFF' : '#717680'
     },
     rowMonths: {
-        background: theme.palette.type !== 'dark' ? '#DDFFFF' : '#1f5557'
+        background: theme.palette.mode !== 'dark' ? '#DDFFFF' : '#1f5557'
     },
     rowMonthsDates: {
-        background: theme.palette.type !== 'dark' ? '#EEFFFF' : '#3c5737',
+        background: theme.palette.mode !== 'dark' ? '#EEFFFF' : '#3c5737',
         maxWidth: 600
     },
     rowYears: {
-        background: theme.palette.type !== 'dark' ? '#fbffdd' : '#574b33'
+        background: theme.palette.mode !== 'dark' ? '#fbffdd' : '#574b33'
     },
     rowDaysDows: {
-        background: theme.palette.type !== 'dark' ? '#EEEAFF' : '#573544',
+        background: theme.palette.mode !== 'dark' ? '#EEEAFF' : '#573544',
         paddingLeft: 10,
         paddingBottom: 10
     },
     rowDowsDows: {
-        background: theme.palette.type !== 'dark' ? '#EEFFEE' : '#3d4c54',
+        background: theme.palette.mode !== 'dark' ? '#EEFFEE' : '#3d4c54',
         paddingLeft: 10,
         paddingBottom: 10
     }
@@ -163,13 +163,15 @@ function padding(num) {
 function TextTime(props) {
     const {inputRef, ...other} = props;
 
-    return <MaskedInput
-        {...other}
-        ref={inputRef}
-        mask={[/[0-2]/, /[0-9]/, ':', /[0-5]/, /[0-9]/]}
-        placeholderChar={props.placeholder || '00:00'}
-        showMask
-    />;
+    return (
+        <MaskedInput
+            {...other}
+            ref={inputRef}
+            mask={[/[0-2]/, /[0-9]/, ':', /[0-5]/, /[0-9]/]}
+            placeholderChar={props.placeholder || '00:00'}
+            showMask
+        />
+    );
 }
 
 TextTime.propTypes = {
@@ -179,13 +181,15 @@ TextTime.propTypes = {
 function TextDate(props) {
     const {inputRef, ...other} = props;
 
-    return <MaskedInput
-        {...other}
-        ref={inputRef}
-        mask={[/[0-3]/, /[0-9]/, '.', /[0-1]/, /[0-9]/, '.', '2', '0', /[0-9]/, /[0-9]/]}
-        placeholderChar={props.placeholder || '01.01.2020'}
-        showMask
-    />;
+    return (
+        <MaskedInput
+            {...other}
+            ref={inputRef}
+            mask={[/[0-3]/, /[0-9]/, '.', /[0-1]/, /[0-9]/, '.', '2', '0', /[0-9]/, /[0-9]/]}
+            placeholderChar={props.placeholder || '01.01.2020'}
+            showMask
+        />
+    );
 }
 
 TextDate.propTypes = {

@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.scss';
-import { withStyles, MuiThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+
+import withStyles from '@mui/styles/withStyles';
 
 import GenericApp from './adapter-react-v5/src/GenericApp';
 import Loader from './adapter-react-v5/src/Components/Loader';
@@ -45,18 +47,26 @@ class App extends GenericApp {
 
     render() {
         if (!this.state.loaded) {
-            return <MuiThemeProvider theme={this.state.theme}>
-                <Loader theme={this.state.themeType} />
-            </MuiThemeProvider>;
+            return (
+                <StyledEngineProvider injectFirst>
+                    <ThemeProvider theme={this.state.theme}>
+                        <Loader theme={this.state.themeType} />
+                    </ThemeProvider>
+                </StyledEngineProvider>
+            );
         }
 
-        return <MuiThemeProvider theme={this.state.theme}>
-            <ObjectBrowser
-                lang={I18n.lang}
-                t={I18n.t}
-                socket={this.socket}
-            />
-        </MuiThemeProvider>;
+        return (
+            <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={this.state.theme}>
+                    <ObjectBrowser
+                        lang={I18n.lang}
+                        t={I18n.t}
+                        socket={this.socket}
+                    />
+                </ThemeProvider>
+            </StyledEngineProvider>
+        );
     }
 }
 

@@ -1,15 +1,15 @@
 // please do not delete React, as without it other projects could not be compiled: ReferenceError: React is not defined
 import React from 'react';
-import withStyles from '@material-ui/core/styles/withStyles';
-import Fab from '@material-ui/core/Fab';
+import withStyles from '@mui/styles/withStyles';
+import Fab from '@mui/material/Fab';
 import PropTypes from 'prop-types';
 
-import Toolbar from '@material-ui/core/Toolbar';
+import Toolbar from '@mui/material/Toolbar';
 
 import I18n from '../i18n';
 
-import IconSave from '@material-ui/icons/Save';
-import IconClose from '@material-ui/icons/Close';
+import IconSave from '@mui/icons-material/Save';
+import IconClose from '@mui/icons-material/Close';
 
 const styles = theme => ({
     buttonIcon: {

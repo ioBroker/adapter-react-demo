@@ -16,11 +16,11 @@
 import React from 'react';
 import {ChromePicker} from 'react-color';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 
-import TextField from '@material-ui/core/TextField';
-import IconButton from '@material-ui/core/IconButton';
-import IconDelete from '@material-ui/icons/Delete';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import IconDelete from '@mui/icons-material/Delete';
 
 const styles = theme => ({
     color: {

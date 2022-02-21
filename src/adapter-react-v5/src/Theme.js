@@ -1,6 +1,6 @@
-import { createTheme } from '@material-ui/core/styles';
+import { createTheme, adaptV4Theme } from '@mui/material/styles';
 
-import orange from '@material-ui/core/colors/orange';
+import { orange } from '@mui/material/colors';
 
 const step = (16 - 5) / 23 / 100;
 
@@ -64,10 +64,10 @@ function getElevation(color, overlayColor, elevation) {
  * Get all 24 elevations of the given color and overlay.
  * @param {string} color color in the format '#rrggbb' or '#rgb'
  * @param {string} overlay overlay color in the format '#rrggbb' or '#rgb'
- * @returns {import('@material-ui/core/styles/withStyles').CSSProperties}
+ * @returns {import('@mui/material/styles/withStyles').CSSProperties}
  */
 function getElevations(color, overlay) {
-    /** @type {import('@material-ui/core/styles/withStyles').CSSProperties} */
+    /** @type {import('@mui/material/styles/withStyles').CSSProperties} */
     const elevations = {};
 
     for(let i = 1; i <= 24; i++) {
@@ -90,7 +90,7 @@ const Theme = type => {
         theme = {
             name: type,
             palette: {
-                type: 'dark',
+                mode: 'dark',
                 background: {
                     paper: '#121212',
                     default: '#121212'
@@ -130,7 +130,7 @@ const Theme = type => {
         theme = {
             name: type,
             palette: {
-                type: 'dark',
+                mode: 'dark',
                 background: {
                     paper: '#151d21',
                     default: '#151d21'
@@ -170,7 +170,7 @@ const Theme = type => {
         theme = {
             name: type,
             palette: {
-                type: 'light',
+                mode: 'light',
                 primary: {
                     main: '#3399CC'
                 },
@@ -201,7 +201,7 @@ const Theme = type => {
         theme = {
             name: type,
             palette: {
-                type: 'light',
+                mode: 'light',
                 primary: {
                     main: '#0F99DE'
                 },
@@ -232,7 +232,7 @@ const Theme = type => {
         theme = {
             name: type,
             palette: {
-                type: 'light',
+                mode: 'light',
                 primary: {
                     main: '#F5F5F7'
                 },
@@ -268,7 +268,7 @@ const Theme = type => {
         theme = {
             name: type,
             palette: {
-                type: 'light',
+                mode: 'light',
                 primary: {
                     main: '#3399CC'
                 },
@@ -305,7 +305,7 @@ const Theme = type => {
         }
     };
 
-    return createTheme(theme);
+    return createTheme(adaptV4Theme(theme));
 };
 
 export default Theme;

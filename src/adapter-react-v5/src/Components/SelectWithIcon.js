@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 
-import {FormControl, InputLabel, MenuItem, Select} from '@material-ui/core';
+import {FormControl, InputLabel, MenuItem, Select} from '@mui/material';
 
 import Icon from './Icon';
 import Utils from './Utils';

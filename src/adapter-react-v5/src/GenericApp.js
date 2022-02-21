@@ -11,10 +11,10 @@ import * as Sentry from '@sentry/browser';
 import * as SentryIntegrations from '@sentry/integrations';
 
 import DialogError from './Dialogs/Error';
-import Snackbar from '@material-ui/core/Snackbar';
-import IconButton from '@material-ui/core/IconButton';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
 
-import IconClose from '@material-ui/icons/Close';
+import IconClose from '@mui/icons-material/Close';
 
 import printPrompt from './Prompt';
 import theme from './Theme';
@@ -334,7 +334,7 @@ class GenericApp extends Router {
      * @returns {string} Theme type
      */
     getThemeType(theme) {
-        return theme.palette.type;
+        return theme.palette.mode;
     }
 
     /**
@@ -598,11 +598,12 @@ class GenericApp extends Router {
                         color="inherit"
                         className={this.props.classes.close}
                         onClick={() => this.setState({toast: ''})}
-                    >
+                        size="large">
                         <IconClose />
                     </IconButton>,
                 ]}
-            />);
+            />
+        );
     }
 
     /**

@@ -1,18 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withWidth from "@material-ui/core/withWidth";
-import {withStyles} from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
-import IconClose from '@material-ui/icons/Close';
-import IconCheck from '@material-ui/icons/Check';
+import IconClose from '@mui/icons-material/Close';
+import IconCheck from '@mui/icons-material/Check';
+
+// FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
+const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
 
 const styles = {
 

@@ -1,4 +1,4 @@
-import {Theme as MuiTheme} from "@material-ui/core/styles";
+import {Theme as MuiTheme} from "@mui/material/styles";
 
 export type Translator = (key: string, arg1?: any, arg2?: any, arg3?: any) => string;
 

@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import CircularProgress from '@mui/material/CircularProgress';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 
-import CloseIcon from '@material-ui/icons/Close';
-import ClearIcon from '@material-ui/icons/Clear';
+import CloseIcon from '@mui/icons-material/Close';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import Icon from './Icon';
 import Utils from './Utils';
@@ -171,13 +171,15 @@ class IconSelector extends Component {
                     <div style={{width: '100%', textAlign: 'center'}}>
                         {this.state.icons && this.state.icons.map((icon, i) => {
                             if (!this.state.filter || (this.state.names[i] && this.state.names[i].toLowerCase().includes(this.state.filter))) {
-                                return <Tooltip title={this.state.names[i] || ''} key={i}><IconButton
-                                    onClick={() =>
-                                        this.setState({opened: false}, () =>
-                                            this.props.onSelect(icon))}
-                                >
-                                    <Icon src={icon} alt={i} style={{width: 32, height: 32, borderRadius: 5}}/>
-                                </IconButton></Tooltip>;
+                                return (
+                                    <Tooltip title={this.state.names[i] || ''} key={i}><IconButton
+                                        onClick={() =>
+                                            this.setState({opened: false}, () =>
+                                                this.props.onSelect(icon))}
+                                        size="large">
+                                        <Icon src={icon} alt={i} style={{width: 32, height: 32, borderRadius: 5}}/>
+                                    </IconButton></Tooltip>
+                                );
                             } else {
                                 return null;
                             }
