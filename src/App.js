@@ -1,16 +1,47 @@
 import React from 'react';
 import './App.scss';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+import { Select, MenuItem } from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
 
 import GenericApp from './adapter-react-v5/src/GenericApp';
-import Loader from './adapter-react-v5/src/Components/Loader';
 import I18n from './adapter-react-v5/src/i18n';
+
+import ColorPicker from './adapter-react-v5/src/Components/ColorPicker';
+import ComplexCron from './adapter-react-v5/src/Components/ComplexCron';
+import FileBrowser from './adapter-react-v5/src/Components/FileBrowser';
+import FileViewer from './adapter-react-v5/src/Components/FileViewer';
+import Icon from './adapter-react-v5/src/Components/Icon';
+import IconPicker from './adapter-react-v5/src/Components/IconPicker';
+import IconSelector from './adapter-react-v5/src/Components/IconSelector';
+import Image from './adapter-react-v5/src/Components/Image';
+import Loader from './adapter-react-v5/src/Components/Loader';
+import Logo from './adapter-react-v5/src/Components/Logo';
+import MDUtils from './adapter-react-v5/src/Components/MDUtils';
 import ObjectBrowser from './adapter-react-v5/src/Components/ObjectBrowser';
+import Router from './adapter-react-v5/src/Components/Router';
+import SaveCloseButtons from './adapter-react-v5/src/Components/SaveCloseButtons';
+import Schedule from './adapter-react-v5/src/Components/Schedule';
+import SelectWithIcon from './adapter-react-v5/src/Components/SelectWithIcon';
+import TabContainer from './adapter-react-v5/src/Components/TabContainer';
+import TabContent from './adapter-react-v5/src/Components/TabContent';
+import TabHeader from './adapter-react-v5/src/Components/TabHeader';
+import TextWithIcon from './adapter-react-v5/src/Components/TextWithIcon';
+import ToggleThemeMenu from './adapter-react-v5/src/Components/ToggleThemeMenu';
+import TreeTable from './adapter-react-v5/src/Components/TreeTable';
+import Utils from './adapter-react-v5/src/Components/Utils';
+
+import ComplexCronDialog from './adapter-react-v5/src/Dialogs/ComplexCron';
+import Confirm from './adapter-react-v5/src/Dialogs/Confirm';
+import Cron from './adapter-react-v5/src/Dialogs/Cron';
+import Error from './adapter-react-v5/src/Dialogs/Error';
+import Message from './adapter-react-v5/src/Dialogs/Message';
+import SelectID from './adapter-react-v5/src/Dialogs/SelectID';
+import SimpleCron from './adapter-react-v5/src/Dialogs/SimpleCron';
+import TextInput from './adapter-react-v5/src/Dialogs/TextInput';
 
 const styles = theme => ({
-
 });
 
 class App extends GenericApp {
@@ -38,6 +69,7 @@ class App extends GenericApp {
 
         this.state = {
             ...this.state,
+            component: 'ObjectBrowser',
         };
     }
 
@@ -46,6 +78,44 @@ class App extends GenericApp {
     }
 
     render() {
+        const components = {
+            ColorPicker: <ColorPicker />,
+            ComplexCron: <ComplexCron />,
+            FileBrowser: <FileBrowser />,
+            FileViewer: <FileViewer />,
+            Icon: <Icon />,
+            IconPicker: <IconPicker />,
+            IconSelector: <IconSelector />,
+            Image: <Image />,
+            Loader: <Loader />,
+            Logo: <Logo />,
+            MDUtils: <MDUtils />,
+            ObjectBrowser: <ObjectBrowser
+                lang={I18n.lang}
+                t={I18n.t}
+                socket={this.socket}
+            />,
+            Router: <Router />,
+            SaveCloseButtons: <SaveCloseButtons />,
+            Schedule: <Schedule />,
+            SelectWithIcon: <SelectWithIcon />,
+            TabContainer: <TabContainer />,
+            TabContent: <TabContent />,
+            TabHeader: <TabHeader />,
+            TextWithIcon: <TextWithIcon />,
+            ToggleThemeMenu: <ToggleThemeMenu />,
+            TreeTable: <TreeTable />,
+            Utils: <Utils />,
+            ComplexCronDialog: <ComplexCronDialog />,
+            Confirm: <Confirm />,
+            Cron: <Cron />,
+            Error: <Error />,
+            Message: <Message />,
+            SelectID: <SelectID />,
+            SimpleCron: <SimpleCron />,
+            TextInput: <TextInput />,
+        };
+
         if (!this.state.loaded) {
             return (
                 <StyledEngineProvider injectFirst>
@@ -59,11 +129,22 @@ class App extends GenericApp {
         return (
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
-                    <ObjectBrowser
-                        lang={I18n.lang}
-                        t={I18n.t}
-                        socket={this.socket}
-                    />
+                    <div>
+                        <Select
+                            value={this.state.component}
+                            onChange={e => this.setState({ component: e.target.value })}
+                        >
+                            {Object.keys(components).map(name => <MenuItem
+                                key={name}
+                                value={name}
+                            >
+                                {name}
+                            </MenuItem>)}
+                        </Select>
+                    </div>
+                    <div>
+                        {components[this.state.component]}
+                    </div>
                 </ThemeProvider>
             </StyledEngineProvider>
         );
