@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.scss';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import { Select, MenuItem } from '@mui/material';
+import {
+    Select, MenuItem, Button, Stack, MenuList,
+} from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
 
@@ -42,6 +44,11 @@ import SimpleCron from './adapter-react-v5/src/Dialogs/SimpleCron';
 import TextInput from './adapter-react-v5/src/Dialogs/TextInput';
 
 const styles = theme => ({
+    app: {
+        backgroundColor: theme.palette.background.default,
+        color: theme.palette.text.primary,
+        height: '100%',
+    },
 });
 
 class App extends GenericApp {
@@ -70,11 +77,16 @@ class App extends GenericApp {
         this.state = {
             ...this.state,
             component: 'ObjectBrowser',
+            error: false,
         };
     }
 
     async onConnectionReady() {
 
+    }
+
+    static getDerivedStateFromError(error) {
+        return { error: true, errorText: error };
     }
 
     render() {
@@ -129,21 +141,31 @@ class App extends GenericApp {
         return (
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
-                    <div>
-                        <Select
-                            value={this.state.component}
-                            onChange={e => this.setState({ component: e.target.value })}
-                        >
-                            {Object.keys(components).map(name => <MenuItem
-                                key={name}
-                                value={name}
-                            >
-                                {name}
-                            </MenuItem>)}
-                        </Select>
-                    </div>
-                    <div>
-                        {components[this.state.component]}
+                    <div className={this.props.classes.app}>
+                        <Stack direction="row" spacing={2} style={{ height: '100%' }}>
+                            <div style={{ overflowY: 'auto', height: '100%' }}>
+                                <MenuList>
+                                    {Object.keys(components).map(name => <MenuItem
+                                        key={name}
+                                        selected={name === this.state.component}
+                                        onClick={e => this.setState({ component: name, error: false })}
+                                    >
+                                        {name}
+                                    </MenuItem>)}
+                                </MenuList>
+                            </div>
+                            <div>
+                                {this.state.error
+                                    ? <>
+                                        <div>
+                                            {'Error component: '}
+                                            {this.state.component}
+                                        </div>
+                                        <pre>{this.state.errorText.stack.toString()}</pre>
+                                    </>
+                                    : components[this.state.component]}
+                            </div>
+                        </Stack>
                     </div>
                 </ThemeProvider>
             </StyledEngineProvider>
