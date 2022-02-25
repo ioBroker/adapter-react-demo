@@ -35,13 +35,66 @@ import TreeTable from './adapter-react-v5/src/Components/TreeTable';
 import Utils from './adapter-react-v5/src/Components/Utils';
 
 import ComplexCronDialog from './adapter-react-v5/src/Dialogs/ComplexCron';
-import Confirm from './adapter-react-v5/src/Dialogs/Confirm';
-import Cron from './adapter-react-v5/src/Dialogs/Cron';
-import Error from './adapter-react-v5/src/Dialogs/Error';
-import Message from './adapter-react-v5/src/Dialogs/Message';
-import SelectID from './adapter-react-v5/src/Dialogs/SelectID';
-import SimpleCron from './adapter-react-v5/src/Dialogs/SimpleCron';
-import TextInput from './adapter-react-v5/src/Dialogs/TextInput';
+import ConfirmDialog from './adapter-react-v5/src/Dialogs/Confirm';
+import CronDialog from './adapter-react-v5/src/Dialogs/Cron';
+import ErrorDialog from './adapter-react-v5/src/Dialogs/Error';
+import MessageDialog from './adapter-react-v5/src/Dialogs/Message';
+import SelectIDDialog from './adapter-react-v5/src/Dialogs/SelectID';
+import SimpleCronDialog from './adapter-react-v5/src/Dialogs/SimpleCron';
+import TextInputDialog from './adapter-react-v5/src/Dialogs/TextInput';
+
+const treeData = [
+    {
+        id: 'UniqueID1', // required
+        fieldIdInData: 'Name1',
+        myType: 'number',
+    },
+    {
+        id: 'UniqueID2', // required
+        fieldIdInData: 'Name12',
+        myType: 'string',
+    },
+];
+
+const treeColumns = [
+    {
+        title: 'Name of field', // required, else it will be "field"
+        field: 'fieldIdInData', // required
+        editable: false, // or true [default - true]
+        cellStyle: { // CSS style - // optional
+            maxWidth: '12rem',
+            overflow: 'hidden',
+            wordBreak: 'break-word',
+        },
+        lookup: { // optional => edit will be automatically "SELECT"
+            value1: 'text1',
+            value2: 'text2',
+        },
+    },
+    {
+        title: 'Type', // required, else it will be "field"
+        field: 'myType', // required
+        editable: true, // or true [default - true]
+        lookup: { // optional => edit will be automatically "SELECT"
+            number: 'Number',
+            string: 'String',
+            boolean: 'Boolean',
+        },
+        type: 'number/string/color/oid/icon/boolean', // oid=ObjectID,icon=base64-icon
+        editComponent: props => <div>
+Prefix&#123;
+            {' '}
+            <br />
+            <textarea
+                rows={4}
+                style={{ width: '100%', resize: 'vertical' }}
+                value={props.value}
+                onChange={e => props.onChange(e.target.value)}
+            />
+                Suffix
+        </div>,
+    },
+];
 
 const styles = theme => ({
     app: {
@@ -116,16 +169,19 @@ class App extends GenericApp {
             TabHeader: <TabHeader />,
             TextWithIcon: <TextWithIcon />,
             ToggleThemeMenu: <ToggleThemeMenu />,
-            TreeTable: <TreeTable />,
+            TreeTable: <TreeTable
+                columns={treeColumns}
+                data={treeData}
+            />,
             Utils: <Utils />,
-            ComplexCronDialog: <ComplexCronDialog />,
-            Confirm: <Confirm />,
-            Cron: <Cron />,
-            Error: <Error />,
-            Message: <Message />,
-            SelectID: <SelectID />,
-            SimpleCron: <SimpleCron />,
-            TextInput: <TextInput />,
+            ComplexCronDialog: <ComplexCronDialog onClose={() => this.setState({ component: null })} />,
+            Confirm: <ConfirmDialog onClose={() => this.setState({ component: null })} />,
+            Cron: <CronDialog onClose={() => this.setState({ component: null })} />,
+            Error: <ErrorDialog onClose={() => this.setState({ component: null })} />,
+            Message: <MessageDialog onClose={() => this.setState({ component: null })} />,
+            SelectID: <SelectIDDialog onClose={() => this.setState({ component: null })} />,
+            SimpleCron: <SimpleCronDialog onClose={() => this.setState({ component: null })} />,
+            TextInput: <TextInputDialog onClose={() => this.setState({ component: null })} />,
         };
 
         if (!this.state.loaded) {
