@@ -8,6 +8,7 @@ import {
 import withStyles from '@mui/styles/withStyles';
 
 import GenericApp from './adapter-react-v5/src/GenericApp';
+import Connection from './ConnectionSimulate';
 import I18n from './adapter-react-v5/src/i18n';
 
 import ColorPicker from './adapter-react-v5/src/Components/ColorPicker';
@@ -121,6 +122,7 @@ class App extends GenericApp {
         };
 
         extendedProps.sentryDSN = window.sentryDSN;
+        extendedProps.Connection = Connection;
 
         super(props, extendedProps);
 
