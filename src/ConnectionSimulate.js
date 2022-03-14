@@ -263,6 +263,7 @@ class ConnectionSimulate {
                             this.systemLang = 'en';
                         }
                     }
+                    this.systemLang = 'en';
 
                     this.props.onLanguage && this.props.onLanguage(this.systemLang);
 

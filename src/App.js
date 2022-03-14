@@ -2,7 +2,7 @@ import React from 'react';
 import './App.scss';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import {
-    Select, MenuItem, Button, Stack, MenuList,
+    MenuItem, Stack, MenuList,
 } from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
@@ -21,19 +21,13 @@ import IconSelector from './adapter-react-v5/src/Components/IconSelector';
 import Image from './adapter-react-v5/src/Components/Image';
 import Loader from './adapter-react-v5/src/Components/Loader';
 import Logo from './adapter-react-v5/src/Components/Logo';
-import MDUtils from './adapter-react-v5/src/Components/MDUtils';
 import ObjectBrowser from './adapter-react-v5/src/Components/ObjectBrowser';
-import Router from './adapter-react-v5/src/Components/Router';
 import SaveCloseButtons from './adapter-react-v5/src/Components/SaveCloseButtons';
 import Schedule from './adapter-react-v5/src/Components/Schedule';
 import SelectWithIcon from './adapter-react-v5/src/Components/SelectWithIcon';
-import TabContainer from './adapter-react-v5/src/Components/TabContainer';
-import TabContent from './adapter-react-v5/src/Components/TabContent';
-import TabHeader from './adapter-react-v5/src/Components/TabHeader';
 import TextWithIcon from './adapter-react-v5/src/Components/TextWithIcon';
 import ToggleThemeMenu from './adapter-react-v5/src/Components/ToggleThemeMenu';
 import TreeTable from './adapter-react-v5/src/Components/TreeTable';
-import Utils from './adapter-react-v5/src/Components/Utils';
 
 import ComplexCronDialog from './adapter-react-v5/src/Dialogs/ComplexCron';
 import ConfirmDialog from './adapter-react-v5/src/Dialogs/Confirm';
@@ -103,6 +97,20 @@ const styles = theme => ({
         color: theme.palette.text.primary,
         height: '100%',
     },
+    component: {
+        width: '100%',
+        overflowY: 'auto',
+    },
+    stack: {
+        height: 'calc(100% - 80px)',
+    },
+    menu: {
+        overflowY: 'auto', height: '100%', width: 320,
+    },
+    header: {
+        paddingTop: 10,
+        marginTop: 0,
+    },
 });
 
 class App extends GenericApp {
@@ -131,59 +139,62 @@ class App extends GenericApp {
 
         this.state = {
             ...this.state,
-            component: 'ObjectBrowser',
+            component: window.localStorage.getItem('component') ? window.localStorage.getItem('component') : 'ObjectBrowser',
             error: false,
         };
     }
 
     async onConnectionReady() {
-
+        //
     }
 
     static getDerivedStateFromError(error) {
         return { error: true, errorText: error };
     }
 
+    setComponent = component => {
+        this.setState({ component, error: false });
+        window.localStorage.setItem('component', component);
+    }
+
     render() {
         const components = {
             ColorPicker: <ColorPicker />,
             ComplexCron: <ComplexCron />,
-            FileBrowser: <FileBrowser />,
-            FileViewer: <FileViewer />,
+            FileBrowser: <FileBrowser socket={this.socket} />,
+            FileViewer: <FileViewer href="" t={I18n.t} />,
             Icon: <Icon />,
             IconPicker: <IconPicker />,
-            IconSelector: <IconSelector />,
+            IconSelector: <IconSelector t={I18n.t} />,
             Image: <Image />,
             Loader: <Loader />,
-            Logo: <Logo />,
-            MDUtils: <MDUtils />,
+            Logo: <Logo
+                native={{}}
+                common={{}}
+                instance=""
+            />,
             ObjectBrowser: <ObjectBrowser
                 lang={I18n.lang}
                 t={I18n.t}
                 socket={this.socket}
             />,
-            Router: <Router />,
-            SaveCloseButtons: <SaveCloseButtons />,
+            SaveCloseButtons: <SaveCloseButtons theme={this.state.theme} />,
             Schedule: <Schedule />,
-            SelectWithIcon: <SelectWithIcon />,
-            TabContainer: <TabContainer />,
-            TabContent: <TabContent />,
-            TabHeader: <TabHeader />,
+            SelectWithIcon: <SelectWithIcon options={[]} list={[]} />,
             TextWithIcon: <TextWithIcon />,
-            ToggleThemeMenu: <ToggleThemeMenu />,
+            ToggleThemeMenu: <ToggleThemeMenu t={I18n.t} />,
             TreeTable: <TreeTable
                 columns={treeColumns}
                 data={treeData}
             />,
-            Utils: <Utils />,
-            ComplexCronDialog: <ComplexCronDialog onClose={() => this.setState({ component: null })} />,
-            Confirm: <ConfirmDialog onClose={() => this.setState({ component: null })} />,
-            Cron: <CronDialog onClose={() => this.setState({ component: null })} />,
-            Error: <ErrorDialog onClose={() => this.setState({ component: null })} />,
-            Message: <MessageDialog onClose={() => this.setState({ component: null })} />,
-            SelectID: <SelectIDDialog onClose={() => this.setState({ component: null })} />,
-            SimpleCron: <SimpleCronDialog onClose={() => this.setState({ component: null })} />,
-            TextInput: <TextInputDialog onClose={() => this.setState({ component: null })} />,
+            ComplexCronDialog: <ComplexCronDialog onClose={() => this.setComponent(null)} />,
+            ConfirmDialog: <ConfirmDialog onClose={() => this.setComponent(null)} />,
+            CronDialog: <CronDialog onClose={() => this.setComponent(null)} />,
+            ErrorDialog: <ErrorDialog onClose={() => this.setComponent(null)} />,
+            MessageDialog: <MessageDialog onClose={() => this.setComponent(null)} />,
+            SelectIDDialog: <SelectIDDialog onClose={() => this.setComponent(null)} />,
+            SimpleCronDialog: <SimpleCronDialog onClose={() => this.setComponent(null)} />,
+            TextInputDialog: <TextInputDialog onClose={() => this.setComponent(null)} />,
         };
 
         if (!this.state.loaded) {
@@ -200,23 +211,29 @@ class App extends GenericApp {
             <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
                     <div className={this.props.classes.app}>
-                        <Stack direction="row" spacing={2} style={{ height: '100%' }}>
-                            <div style={{ overflowY: 'auto', height: '100%' }}>
+                        <h1 className={this.props.classes.header}>{I18n.t('Adapter react')}</h1>
+                        <Stack direction="row" spacing={2} className={this.props.classes.stack}>
+                            <div className={this.props.classes.menu}>
                                 <MenuList>
                                     {Object.keys(components).map(name => <MenuItem
                                         key={name}
                                         selected={name === this.state.component}
-                                        onClick={e => this.setState({ component: name, error: false })}
+                                        onClick={e => this.setComponent(name)}
                                     >
                                         {name}
                                     </MenuItem>)}
                                 </MenuList>
                             </div>
-                            <div>
+                            <div className={this.props.classes.component}>
+                                <h2>
+                                    {components[this.state.component]
+                                        ? this.state.component
+                                        : I18n.t('Select component')}
+                                </h2>
                                 {this.state.error
                                     ? <>
                                         <div>
-                                            {'Error component: '}
+                                            {I18n.t('Error component: ')}
                                             {this.state.component}
                                         </div>
                                         <pre>{this.state.errorText.stack.toString()}</pre>
