@@ -1,15 +1,30 @@
 import React from 'react';
 import './App.scss';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import {
-    MenuItem, Stack, MenuList,
-} from '@mui/material';
+import { MenuItem, Stack, MenuList } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Fab from '@mui/material/Fab';
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 import withStyles from '@mui/styles/withStyles';
 
 import GenericApp from './adapter-react-v5/src/GenericApp';
+import DialogWrapper from './Dialog';
 import Connection from './ConnectionSimulate';
 import I18n from './adapter-react-v5/src/i18n';
+import copy from 'copy-to-clipboard';
 
 import ColorPicker from './adapter-react-v5/src/Components/ColorPicker';
 import ComplexCron from './adapter-react-v5/src/Components/ComplexCron';
@@ -77,16 +92,16 @@ const treeColumns = [
         },
         type: 'number/string/color/oid/icon/boolean', // oid=ObjectID,icon=base64-icon
         editComponent: props => <div>
-Prefix&#123;
+            Prefix&#123;
             {' '}
-            <br />
+            <br/>
             <textarea
                 rows={4}
-                style={{ width: '100%', resize: 'vertical' }}
+                style={{width: '100%', resize: 'vertical'}}
                 value={props.value}
                 onChange={e => props.onChange(e.target.value)}
             />
-                Suffix
+            Suffix
         </div>,
     },
 ];
@@ -110,6 +125,29 @@ const styles = theme => ({
     header: {
         paddingTop: 10,
         marginTop: 0,
+    },
+    componentOptionsDiv: {
+        width: '100%',
+        height: 'calc(100% - 72px)',
+    },
+    componentDiv: {
+        height: 'calc(100% - 200px)',
+    },
+    optionsDiv: {
+        borderTop: '1px solid grey',
+        height: 200,
+        position: 'relative',
+    },
+    optionsTitle: {
+        fontSize: 20,
+    },
+    optionsGithub: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+    },
+    optionItem: {
+        paddingRight: 10,
     },
 });
 
@@ -141,25 +179,33 @@ class App extends GenericApp {
             ...this.state,
             component: window.localStorage.getItem('component') ? window.localStorage.getItem('component') : 'ObjectBrowser',
             error: false,
+            options: {},
+            openDialog: false,
+            example: '',
         };
-    }
 
-    async onConnectionReady() {
-        //
-    }
-
-    static getDerivedStateFromError(error) {
-        return { error: true, errorText: error };
-    }
-
-    setComponent = component => {
-        this.setState({ component, error: false });
-        window.localStorage.setItem('component', component);
-    }
-
-    render() {
-        const components = {
-            ColorPicker: <ColorPicker />,
+        this.components = {
+            ColorPicker: {
+                component: ColorPicker,
+                props: {
+                    style: { maxWidth: 250 },
+                },
+                custom: true,
+                options: {
+                    disabled: { type: 'checkbox', default: false },
+                    name: { type: 'text' },
+                    openAbove: { type: 'checkbox', default: false },
+                },
+                value: '#12345',
+                onChange: true,
+                example: `<ColorPicker
+    value={this.state.color}
+    onChange={color => this.setState({color})}
+    openAbove={false}
+    name={I18n.t('Color')}
+    disabled={false}
+/>`,
+            },
             ComplexCron: <ComplexCron />,
             FileBrowser: <FileBrowser socket={this.socket} />,
             FileViewer: <FileViewer href="" t={I18n.t} />,
@@ -188,7 +234,7 @@ class App extends GenericApp {
                 data={treeData}
             />,
             ComplexCronDialog: <ComplexCronDialog onClose={() => this.setComponent(null)} />,
-            ConfirmDialog: <ConfirmDialog onClose={() => this.setComponent(null)} />,
+            ConfirmDialog: <DialogWrapper component={ConfirmDialog} />,
             CronDialog: <CronDialog onClose={() => this.setComponent(null)} />,
             ErrorDialog: <ErrorDialog onClose={() => this.setComponent(null)} />,
             MessageDialog: <MessageDialog onClose={() => this.setComponent(null)} />,
@@ -196,55 +242,179 @@ class App extends GenericApp {
             SimpleCronDialog: <SimpleCronDialog onClose={() => this.setComponent(null)} />,
             TextInputDialog: <TextInputDialog onClose={() => this.setComponent(null)} />,
         };
+    }
 
-        if (!this.state.loaded) {
-            return (
-                <StyledEngineProvider injectFirst>
-                    <ThemeProvider theme={this.state.theme}>
-                        <Loader theme={this.state.themeType} />
-                    </ThemeProvider>
-                </StyledEngineProvider>
-            );
+    componentDidMount() {
+        super.componentDidMount();
+        this.setComponent(this.state.component);
+    }
+
+    async onConnectionReady() {
+        //
+    }
+
+    static getDerivedStateFromError(error) {
+        return { error: true, errorText: error };
+    }
+
+    setComponent = component => {
+        const comp = this.components[component];
+        const options = {};
+        let example = '';
+
+        if (comp.custom) {
+            Object.keys(comp.options).forEach(option => {
+                if (comp.options[option].default) {
+                    options[option] = comp.options[option].default;
+                }
+            });
+
+            if (comp.value !== undefined) {
+                options.value = comp.value;
+            }
+            example = comp.example;
         }
 
-        return (
-            <StyledEngineProvider injectFirst>
+        this.setState({ component, error: false, options, example });
+        window.localStorage.setItem('component', component);
+    }
+
+    renderCodeDialog() {
+        return <Dialog
+            open={this.state.openDialog}
+            onClose={() => this.setState({ openDialog: false })}
+        >
+            <DialogTitle>{ I18n.t('Usage example') }</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    <pre>
+                        { this.state.example }
+                    </pre>
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => copy(this.state.example)} variant="outlined">{I18n.t('Copy to clipboard')}</Button>
+                <Button onClick={() => this.setState({ openDialog: false })} autoFocus variant="contained">{I18n.t('Close')}</Button>
+            </DialogActions>
+        </Dialog>;
+    }
+
+    renderComponentAndOptions(comp) {
+        let options = null;
+
+        if (comp.custom) {
+            const Comp = comp.component;
+
+            options = Object.keys(comp.options).map(option => (
+                (item, _option) => {
+                    if (item.type === 'checkbox') {
+                        return <FormControlLabel
+                            control={<Checkbox
+                                value={!!this.state.options[option]}
+                                onChange={() => {
+                                    const _options = JSON.parse(JSON.stringify(this.state.options));
+                                    _options[_option] = !_options[_option];
+                                    this.setState({ options: _options });
+                                }}
+                            />}
+                            label={_option}
+                        />;
+                    } else if (item.type === 'text') {
+                        return <TextField
+                            className={this.props.classes.optionItem}
+                            label={_option}
+                            variant="standard"
+                            value={this.state.options[option]}
+                            onChange={e => {
+                                const _options = JSON.parse(JSON.stringify(this.state.options));
+                                _options[_option] = e.target.value;
+                                this.setState({ options: _options });
+                            }}
+                        />;
+                    }
+
+                    return null;
+                })(comp.options[option], option));
+
+            const props = { ...comp.props, ...this.state.options };
+            if (comp.onChange) {
+                props.onChange = value => {
+                    const _options = JSON.parse(JSON.stringify(this.state.options));
+                    _options.value = value;
+                    this.setState({ options: _options });
+                };
+            }
+
+            comp = <Comp {...props} />;
+        }
+
+        return <div className={ this.props.classes.componentOptionsDiv }>
+            <div className={ this.props.classes.componentDiv }>
+                {comp}
+            </div>
+            <div className={ this.props.classes.optionsDiv }>
+                <div className={ this.props.classes.optionsTitle }>{I18n.t('Options')}</div>
+                {this.state.example ? <Fab color="primary" className={ this.props.classes.optionsGithub } size="small" onClick={() => this.setState({openDialog: true })}>
+                    <GitHubIcon />
+                </Fab> : null }
+                {options}
+            </div>
+        </div>;
+    }
+
+    render() {
+        if (!this.state.loaded) {
+            return <StyledEngineProvider injectFirst>
                 <ThemeProvider theme={this.state.theme}>
-                    <div className={this.props.classes.app}>
-                        <h1 className={this.props.classes.header}>{I18n.t('Adapter react')}</h1>
-                        <Stack direction="row" spacing={2} className={this.props.classes.stack}>
-                            <div className={this.props.classes.menu}>
-                                <MenuList>
-                                    {Object.keys(components).map(name => <MenuItem
-                                        key={name}
-                                        selected={name === this.state.component}
-                                        onClick={e => this.setComponent(name)}
-                                    >
-                                        {name}
-                                    </MenuItem>)}
-                                </MenuList>
-                            </div>
-                            <div className={this.props.classes.component}>
-                                <h2>
-                                    {components[this.state.component]
-                                        ? this.state.component
-                                        : I18n.t('Select component')}
-                                </h2>
-                                {this.state.error
-                                    ? <>
-                                        <div>
-                                            {I18n.t('Error component: ')}
-                                            {this.state.component}
-                                        </div>
-                                        <pre>{this.state.errorText.stack.toString()}</pre>
-                                    </>
-                                    : components[this.state.component]}
-                            </div>
-                        </Stack>
-                    </div>
+                    <Loader theme={this.state.themeType} />
                 </ThemeProvider>
-            </StyledEngineProvider>
-        );
+            </StyledEngineProvider>;
+        }
+
+        return <StyledEngineProvider injectFirst>
+            { this.renderCodeDialog() }
+            <ThemeProvider theme={this.state.theme}>
+                <div className={this.props.classes.app}>
+                    <AppBar position="static">
+                        <Toolbar variant="dense">
+                            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>{
+                                I18n.t('Adapter react')
+                            }</Typography>
+                        </Toolbar>
+                    </AppBar>
+
+                    <Stack direction="row" spacing={2} className={this.props.classes.stack}>
+                        <div className={this.props.classes.menu}>
+                            <MenuList>
+                                {Object.keys(this.components).map(name => <MenuItem
+                                    key={name}
+                                    selected={name === this.state.component}
+                                    onClick={e => this.setComponent(name)}
+                                >
+                                    {name}
+                                </MenuItem>)}
+                            </MenuList>
+                        </div>
+                        <div className={this.props.classes.component}>
+                            <h2>
+                                {this.components[this.state.component]
+                                    ? this.state.component
+                                    : I18n.t('Select component')}
+                            </h2>
+                            {this.state.error
+                                ? <>
+                                    <div>
+                                        {I18n.t('Error component: ')}
+                                        {this.state.component}
+                                    </div>
+                                    <pre>{this.state.errorText.stack.toString()}</pre>
+                                </>
+                                : this.renderComponentAndOptions(this.components[this.state.component])}
+                        </div>
+                    </Stack>
+                </div>
+            </ThemeProvider>
+        </StyledEngineProvider>;
     }
 }
 
