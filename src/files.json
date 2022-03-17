@@ -1,0 +1,18 @@
+{
+  "0_userdata.0": {
+    "error": "Not exists",
+    "result": []
+  },
+  "vis.0": {
+    "result": [
+        {
+          "file": "main",
+          "stats": {},
+          "isDir": true
+        }
+      ]
+  },
+  "vis.0/main": {
+    "result": [{"file":"vis-user.css","stats":{"size":8},"isDir":false,"acl":{"owner":"system.user.admin","ownerGroup":"system.group.administrator","permissions":1536,"read":true,"write":true},"modifiedAt":1645044848388},{"file":"vis-views.json","stats":{"size":15179},"isDir":false,"acl":{"owner":"system.user.admin","ownerGroup":"system.group.administrator","permissions":1536,"read":true,"write":true},"modifiedAt":1645462713909}]
+  }
+}

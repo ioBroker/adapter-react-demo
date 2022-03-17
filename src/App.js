@@ -15,6 +15,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 import GitHubIcon from '@mui/icons-material/GitHub';
 
@@ -207,8 +210,41 @@ class App extends GenericApp {
 />`,
             },
             ComplexCron: <ComplexCron />,
-            FileBrowser: <FileBrowser socket={this.socket} />,
-            FileViewer: <FileViewer href="" t={I18n.t} />,
+            FileBrowser: <FileBrowser socket={this.socket} ready={true} t={I18n.t} />,
+            FileViewer: {
+                component: FileViewer,
+                props: {
+                    t: I18n.t,
+                },
+                dialog: true,
+                custom: true,
+                options: {
+                    fullScreen: { type: 'checkbox', default: false },
+                    lang: {
+                        type: 'options',
+                        default: 'en',
+                        options: [
+                            { value: 'ru', title: 'ru' },
+                            { value: 'de', title: 'de' },
+                            { value: 'en', title: 'en' },
+                        ],
+                    },
+                    href: {
+                        type: 'options',
+                        default: './adapter/admin/admin.png',
+                        options: [
+                            { value: './adapter/admin/admin.png', title: 'image' },
+                            { value: './index.html', title: 'text' },
+                            { value: './manifest.json', title: 'code' },
+                        ],
+                    },
+                },
+                example: `<FileViewer
+    href="./image.png" 
+    t={I18n.t}
+    onClose={ () => this.setState({showViewer: false}) }
+/>`,
+            },
             Icon: <Icon />,
             IconPicker: <IconPicker />,
             IconSelector: <IconSelector t={I18n.t} />,
@@ -331,6 +367,20 @@ class App extends GenericApp {
                                 this.setState({ options: _options });
                             }}
                         />;
+                    } else if (item.type === 'options') {
+                        return <FormControl>
+                            <InputLabel>{_option}</InputLabel>
+                            <Select
+                                value={this.state.options[option]}
+                                onChange={e => {
+                                    const _options = JSON.parse(JSON.stringify(this.state.options));
+                                    _options[_option] = e.target.value;
+                                    this.setState({ options: _options });
+                                }}
+                            >
+                                {item.options.map(it => <MenuItem value={it.value}>{it.title}</MenuItem>)}
+                            </Select>
+                        </FormControl>;
                     }
 
                     return null;
@@ -345,7 +395,14 @@ class App extends GenericApp {
                 };
             }
 
-            comp = <Comp {...props} />;
+            if (comp.dialog) {
+                comp = [
+                    <Button key="button" variant="contained" onClick={() => this.setState({ opened: true })}>Open dialog</Button>,
+                    this.state.opened ? <Comp {...props} onClose={() => this.setState({ opened: false })} /> : null,
+                ];
+            } else {
+                comp = <Comp {...props} />;
+            }
         }
 
         return <div className={ this.props.classes.componentOptionsDiv }>

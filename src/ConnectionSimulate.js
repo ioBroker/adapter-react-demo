@@ -7,6 +7,7 @@
 import PropTypes from 'prop-types';
 import SimulatedObjects from './objects.json';
 import SimulatedStates from './states.json';
+import SimulatedFiles from './files.json';
 
 /** Possible progress states. */
 export const PROGRESS = {
@@ -114,6 +115,7 @@ class ConnectionSimulate {
 
         this.simulateObjects = SimulatedObjects;
         this.simulateStates = SimulatedStates;
+        this.simulateFiles = SimulatedFiles;
 
         this.startSocket();
     }
@@ -206,11 +208,11 @@ class ConnectionSimulate {
      * @private
      */
     _getUserPermissions(cb) {
-        console.debug('[_getUserPermissions]');
+        console.debug('[_getUserPermissions]()');
         if (this.doNotLoadACL) {
             return cb && cb();
         } else {
-            cb(null, {})
+            cb(null, {});
         }
     }
 
@@ -587,7 +589,7 @@ class ConnectionSimulate {
      */
     getAdapterInstances(adapter, update) {
         console.debug(`[getAdapterInstances](adapter=${adapter},update=${update})`);
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
 
@@ -683,7 +685,7 @@ class ConnectionSimulate {
      * @param {string | { [lang in ioBroker.Languages]?: string; }} newName The new name.
      */
     renameGroup(id, newId, newName) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
 
@@ -913,7 +915,7 @@ class ConnectionSimulate {
      * @returns {Promise<{name: string; type: 'public' | 'private' | 'chained'}[]>}
      */
     getCertificates(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
 
@@ -977,7 +979,7 @@ class ConnectionSimulate {
      * @returns {Promise<string[]>}
      */
     getLogs(host, linesNumber) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
 
@@ -995,7 +997,7 @@ class ConnectionSimulate {
      * @returns {Promise<string[]>}
      */
     getLogsFiles(host) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!this.connected) {
@@ -1012,7 +1014,7 @@ class ConnectionSimulate {
      * @returns {Promise<void>}
      */
     delLogs(host) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!this.connected) {
@@ -1028,12 +1030,9 @@ class ConnectionSimulate {
      * @returns {Promise<ioBroker.Object[]>}
      */
     readMetaItems() {
-        if (!this.connected) {
-            return Promise.reject(NOT_CONNECTED);
-        }
-        return new Promise((resolve, reject) =>
-            this._socket.emit('getObjectView', 'system', 'meta', { startkey: '', endkey: '\u9999' }, (err, objs) =>
-                err ? reject(err) : resolve(objs.rows && objs.rows.map(obj => obj.value))));
+        console.debug(`[readMetaItems]()`);
+
+        return Promise.resolve(Object.keys(this.simulateObjects).filter(id => this.simulateObjects[id].type === 'meta').map(id => this.simulateObjects[id]));
     }
 
     /**
@@ -1043,12 +1042,23 @@ class ConnectionSimulate {
      * @returns {Promise<ioBroker.ReadDirResult[]>}
      */
     readDir(adapter, fileName) {
-        if (!this.connected) {
-            return Promise.reject(NOT_CONNECTED);
+        console.debug(`[readDir](adapter=${adapter},fileName=${fileName || '/'})`);
+
+        if (fileName === '/') {
+            fileName = '';
         }
-        return new Promise((resolve, reject) =>
-            this._socket.emit('readDir', adapter, fileName, (err, files) =>
-                err ? reject(err) : resolve(files)));
+
+        const key = adapter + (fileName ? '/' + fileName : '');
+
+        if (this.simulateFiles[key]) {
+            if (this.simulateFiles[key].error) {
+                return Promise.reject(this.simulateFiles[key].error);
+            } else {
+                return Promise.resolve(this.simulateFiles[key].result);
+            }
+        } else {
+            return Promise.reject('Not exists');
+        }
     }
 
     /**
@@ -1083,9 +1093,8 @@ class ConnectionSimulate {
      * @returns {Promise<void>}
      */
     writeFile64(adapter, fileName, data) {
-        if (!this.connected) {
-            return Promise.reject(NOT_CONNECTED);
-        }
+        console.debug(`[writeFile64](adapter=${adapter}, fileName=${fileName}, data=${data.length}`);
+
         return new Promise((resolve, reject) => {
             if (typeof data === 'string') {
                 this._socket.emit('writeFile', adapter, fileName, data, err =>
@@ -1127,12 +1136,9 @@ class ConnectionSimulate {
      * @returns {Promise<void>}
      */
     deleteFile(adapter, fileName) {
-        if (!this.connected) {
-            return Promise.reject(NOT_CONNECTED);
-        }
-        return new Promise((resolve, reject) =>
-            this._socket.emit('unlink', adapter, fileName, err =>
-                err ? reject(err) : resolve()));
+        console.debug(`[deleteFile](adapter=${adapter}, fileName=${fileName}`);
+
+        return Promise.resolve();
     }
 
     /**
@@ -1143,12 +1149,9 @@ class ConnectionSimulate {
      * @returns {Promise<void>}
      */
     deleteFolder(adapter, folderName) {
-        if (!this.connected) {
-            return Promise.reject(NOT_CONNECTED);
-        }
-        return new Promise((resolve, reject) =>
-            this._socket.emit('deleteFolder', adapter, folderName, err =>
-                err ? reject(err) : resolve()));
+        console.debug(`[deleteFolder](adapter=${adapter}, folderName=${folderName}`);
+
+        return Promise.resolve();
     }
 
     /**
@@ -1157,7 +1160,7 @@ class ConnectionSimulate {
      * @returns {Promise<ioBroker.Object[]>}
      */
     getHosts(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.hosts) {
@@ -1191,7 +1194,7 @@ class ConnectionSimulate {
      * @returns {Promise<ioBroker.Object[]>}
      */
     getUsers(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.users) {
@@ -1256,7 +1259,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getHostInfo(host, update, timeoutMs) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!host.startsWith('system.host.')) {
@@ -1305,7 +1308,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getHostInfoShort(host, update, timeoutMs) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!host.startsWith('system.host.')) {
@@ -1355,7 +1358,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getRepository(host, args, update, timeoutMs) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.repo) {
@@ -1404,7 +1407,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getInstalled(host, update, cmdTimeout) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
 
@@ -1457,7 +1460,7 @@ class ConnectionSimulate {
      * @returns {Promise<void>}
      */
     cmdExec(host, cmd, cmdId, cmdTimeout) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!this.connected) {
@@ -1519,7 +1522,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     readBaseSettings(host) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return this.checkFeatureSupported('CONTROLLER_READWRITE_BASE_SETTINGS')
@@ -1568,7 +1571,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     writeBaseSettings(host, config) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return this.checkFeatureSupported('CONTROLLER_READWRITE_BASE_SETTINGS')
@@ -1612,7 +1615,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     restartController(host) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return new Promise((resolve, reject) => {
@@ -1629,7 +1632,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getDiagData(host, typeOfDiag) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return new Promise(resolve => {
@@ -1647,7 +1650,7 @@ class ConnectionSimulate {
         if (!this.connected) {
             return Promise.reject(NOT_CONNECTED);
         }
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return new Promise((resolve, reject) =>
                 this._socket.emit('getStates', pattern || '*', (err, states) =>
                     err ? reject(err) : resolve(states)));
@@ -1740,7 +1743,7 @@ class ConnectionSimulate {
      * @returns {Promise<void>}
      */
     changePassword(user, password) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return new Promise((resolve, reject) =>
@@ -1755,7 +1758,7 @@ class ConnectionSimulate {
      * @returns {Promise<string[]>}
      */
     getIpAddresses(host, update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!host.startsWith('system.host.')) {
@@ -1778,7 +1781,7 @@ class ConnectionSimulate {
      * @returns {Promise<any[<name, address, family>]>}
      */
     getHostByIp(ipOrHostName, update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (ipOrHostName.startsWith('system.host.')) {
@@ -1821,7 +1824,7 @@ class ConnectionSimulate {
      * @returns {Promise<string>}
      */
     encrypt(text) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return new Promise((resolve, reject) =>
@@ -1835,7 +1838,7 @@ class ConnectionSimulate {
      * @returns {Promise<string>}
      */
     decrypt(encryptedText) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         return new Promise((resolve, reject) =>
@@ -1971,7 +1974,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getRatings(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!this.connected) {
@@ -1992,7 +1995,7 @@ class ConnectionSimulate {
 
     // returns very optimized information for adapters to minimize connection load
     getCompactAdapters(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.compactAdapters) {
@@ -2010,7 +2013,7 @@ class ConnectionSimulate {
 
     // returns very optimized information for adapters to minimize connection load
     getCompactInstances(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.compactInstances) {
@@ -2030,7 +2033,7 @@ class ConnectionSimulate {
     // returns very optimized information for adapters to minimize connection load
     // reads only version of installed adapter
     getCompactInstalled(host, update, cmdTimeout) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
 
@@ -2099,7 +2102,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     getCompactRepository(host, update, timeoutMs) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.repoCompact) {
@@ -2146,7 +2149,7 @@ class ConnectionSimulate {
      * @returns {Promise<ioBroker.Object[]>}
      */
     getCompactHosts(update) {
-        if (Connection.isWeb()) {
+        if (ConnectionSimulate.isWeb()) {
             return Promise.reject('Allowed only in admin');
         }
         if (!update && this._promises.hostsCompact) {
@@ -2181,7 +2184,7 @@ class ConnectionSimulate {
     }
 }
 
-ConnectionSimulate.Connection = {
+ConnectionSimulate.ConnectionSimulate = {
     onLog: PropTypes.func,
     onReady: PropTypes.func,
     onProgress: PropTypes.func,
