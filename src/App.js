@@ -23,11 +23,11 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 import withStyles from '@mui/styles/withStyles';
 
+import copy from 'copy-to-clipboard';
 import GenericApp from './adapter-react-v5/src/GenericApp';
 import DialogWrapper from './Dialog';
 import Connection from './ConnectionSimulate';
 import I18n from './adapter-react-v5/src/i18n';
-import copy from 'copy-to-clipboard';
 
 import ColorPicker from './adapter-react-v5/src/Components/ColorPicker';
 import ComplexCron from './adapter-react-v5/src/Components/ComplexCron';
@@ -97,10 +97,10 @@ const treeColumns = [
         editComponent: props => <div>
             Prefix&#123;
             {' '}
-            <br/>
+            <br />
             <textarea
                 rows={4}
-                style={{width: '100%', resize: 'vertical'}}
+                style={{ width: '100%', resize: 'vertical' }}
                 value={props.value}
                 onChange={e => props.onChange(e.target.value)}
             />
@@ -152,6 +152,10 @@ const styles = theme => ({
     optionItem: {
         paddingRight: 10,
     },
+    optionInput: {
+        display: 'inline-block',
+        width: 240,
+    },
 });
 
 class App extends GenericApp {
@@ -186,8 +190,10 @@ class App extends GenericApp {
             openDialog: false,
             example: '',
         };
+    }
 
-        this.components = {
+    getComponents = () => (
+        {
             ColorPicker: {
                 component: ColorPicker,
                 props: {
@@ -209,8 +215,25 @@ class App extends GenericApp {
     disabled={false}
 />`,
             },
-            ComplexCron: <ComplexCron />,
-            FileBrowser: <FileBrowser socket={this.socket} ready={true} t={I18n.t} />,
+            ComplexCron: {
+                component: ComplexCron,
+                custom: true,
+                options: {
+                    cronExpression: { type: 'text' },
+                    language: { type: 'text' },
+                },
+                props: {},
+            },
+            FileBrowser: {
+                component: FileBrowser,
+                custom: true,
+                options: {},
+                props: {
+                    socket: this.socket,
+                    ready: true,
+                    t: I18n.t,
+                },
+            },
             FileViewer: {
                 component: FileViewer,
                 props: {
@@ -245,40 +268,280 @@ class App extends GenericApp {
     onClose={ () => this.setState({showViewer: false}) }
 />`,
             },
-            Icon: <Icon />,
-            IconPicker: <IconPicker />,
-            IconSelector: <IconSelector t={I18n.t} />,
-            Image: <Image />,
-            Loader: <Loader />,
-            Logo: <Logo
-                native={{}}
-                common={{}}
-                instance=""
-            />,
-            ObjectBrowser: <ObjectBrowser
-                lang={I18n.lang}
-                t={I18n.t}
-                socket={this.socket}
-            />,
-            SaveCloseButtons: <SaveCloseButtons theme={this.state.theme} />,
-            Schedule: <Schedule />,
-            SelectWithIcon: <SelectWithIcon options={[]} list={[]} />,
-            TextWithIcon: <TextWithIcon />,
-            ToggleThemeMenu: <ToggleThemeMenu t={I18n.t} />,
-            TreeTable: <TreeTable
-                columns={treeColumns}
-                data={treeData}
-            />,
-            ComplexCronDialog: <ComplexCronDialog onClose={() => this.setComponent(null)} />,
-            ConfirmDialog: <DialogWrapper component={ConfirmDialog} />,
-            CronDialog: <CronDialog onClose={() => this.setComponent(null)} />,
-            ErrorDialog: <ErrorDialog onClose={() => this.setComponent(null)} />,
-            MessageDialog: <MessageDialog onClose={() => this.setComponent(null)} />,
-            SelectIDDialog: <SelectIDDialog onClose={() => this.setComponent(null)} />,
-            SimpleCronDialog: <SimpleCronDialog onClose={() => this.setComponent(null)} />,
-            TextInputDialog: <TextInputDialog onClose={() => this.setComponent(null)} />,
-        };
-    }
+            Icon: {
+                component: Icon,
+                custom: true,
+                options: {
+                    color: { type: 'text' },
+                    title: { type: 'text' },
+                    src: { type: 'text' },
+                    imagePrefix: { type: 'text' },
+                },
+                props: {},
+            },
+            IconPicker: {
+                component: IconPicker,
+                custom: true,
+                options: {
+                    previewClassName: { type: 'text' },
+                    label: { type: 'text' },
+                    name: { type: 'text' },
+                    disabled: { type: 'checkbox' },
+
+                    onlyRooms: { type: 'checkbox' },
+                    onlyDevices: { type: 'checkbox' },
+                },
+                props: {},
+            },
+            IconSelector: {
+                component: IconSelector,
+                custom: true,
+                options: {
+                    onlyRooms: { type: 'checkbox' },
+                    onlyDevices: { type: 'checkbox' },
+                },
+                props: { t: I18n.t },
+            },
+            Image: {
+                component: Image,
+                custom: true,
+                options: {
+                    color: { type: 'text' },
+                    src: { type: 'text' },
+                    imagePrefix: { type: 'text' },
+                },
+                props: {},
+            },
+            Loader: {
+                component: Loader,
+                custom: true,
+                options: {
+                    size: { type: 'text' },
+                },
+                props: {
+                    themeType: this.state.themeType,
+                },
+            },
+            Logo: {
+                component: Logo,
+                custom: true,
+                options: {},
+                props: {
+                    native: {},
+                    common: {},
+                    instance: '',
+                },
+            },
+            ObjectBrowser: {
+                component: ObjectBrowser,
+                custom: true,
+                options: {
+                    dialogName: { type: 'text' },
+                    imagePrefix: { type: 'text' },
+                    themeName: { type: 'text' },
+                    themeType: { type: 'text' },
+                    selected: { type: 'text' },
+                    dateFormat: { type: 'text' },
+                    levelPadding: { type: 'text' },
+
+                    showExpertButton: { type: 'checkbox' },
+                    expertMode: { type: 'checkbox' },
+                    multiSelect: { type: 'checkbox' },
+                    notEditable: { type: 'checkbox' },
+                    foldersFirst: { type: 'checkbox' },
+                    disableColumnSelector: { type: 'checkbox' },
+                    isFloatComma: { type: 'checkbox' },
+                    objectAddBoolean: { type: 'checkbox' },
+                    objectEditBoolean: { type: 'checkbox' },
+                    objectStatesView: { type: 'checkbox' },
+                    objectImportExport: { type: 'checkbox' },
+                    objectEditOfAccessControl: { type: 'checkbox' },
+                },
+                props: {
+                    lang: I18n.lang,
+                    t: I18n.t,
+                    socket: this.socket,
+                },
+            },
+            SaveCloseButtons: {
+                component: SaveCloseButtons,
+                custom: true,
+                options: {
+                    dense: { type: 'checkbox' },
+                    paddingLeft: { type: 'text' },
+                    noTextOnButtons: { type: 'checkbox' },
+                    isIFrame: { type: 'checkbox' },
+                    changed: { type: 'checkbox' },
+                    error: { type: 'checkbox' },
+                    newReact: { type: 'checkbox' },
+                },
+                props: { theme: this.state.theme },
+            },
+            Schedule: {
+                component: Schedule,
+                custom: true,
+                options: {
+                    schedule: { type: 'text' },
+                    language: { type: 'text' },
+                },
+                props: {},
+            },
+            SelectWithIcon: {
+                component: SelectWithIcon,
+                custom: true,
+                options: {
+                    themeType: { type: 'text' },
+                    value: { type: 'text' },
+                    label: { type: 'text' },
+                    className: { type: 'text' },
+                    removePrefix: { type: 'text' },
+                    disabled: { type: 'checkbox' },
+                    fullWidth: { type: 'checkbox' },
+                    allowNone: { type: 'checkbox' },
+                },
+                props: { options: [], list: [] },
+            },
+            TextWithIcon: {
+                component: TextWithIcon,
+                custom: true,
+                options: {
+                    themeType: { type: 'text' },
+                    value: { type: 'text' },
+                    className: { type: 'text' },
+                    title: { type: 'text' },
+                    removePrefix: { type: 'text' },
+                },
+                props: {},
+            },
+            ToggleThemeMenu: {
+                component: ToggleThemeMenu,
+                custom: true,
+                options: {},
+                props: {
+                    t: I18n.t,
+                    toggleTheme: () => this.toggleTheme(),
+                    themeName: this.state.themeName,
+                },
+            },
+            TreeTable: {
+                component: TreeTable,
+                custom: true,
+                options: {
+                    className: { type: 'text' },
+                    name: { type: 'text' },
+                    themeType: { type: 'text' },
+                    loading: { type: 'checkbox' },
+                    noSort: { type: 'checkbox' },
+                    noAdd: { type: 'checkbox' },
+                    glowOnChange: { type: 'checkbox' },
+                },
+                props: {
+                    columns: treeColumns,
+                    data: treeData,
+                },
+            },
+            ComplexCronDialog: {
+                component: ComplexCronDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    title: { type: 'text' },
+                    cron: { type: 'text' },
+                    cancel: { type: 'text' },
+                    ok: { type: 'text' },
+                    simple: { type: 'checkbox' },
+                    language: { type: 'text' },
+                    clearButton: { type: 'checkbox' },
+                },
+                props: {},
+            },
+            ConfirmDialog: {
+                component: ConfirmDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    title: { type: 'text' },
+                    text: { type: 'text' },
+                    ok: { type: 'text' },
+                    cancel: { type: 'text' },
+                    suppressQuestionMinutes: { type: 'text' },
+                    suppressText: { type: 'text' },
+                    dialogName: { type: 'text' },
+                },
+                props: {},
+            },
+            CronDialog: {
+                component: CronDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    title: { type: 'text' },
+                    cron: { type: 'text' },
+                    cancel: { type: 'text' },
+                    ok: { type: 'text' },
+                    simple: { type: 'checkbox' },
+                    complex: { type: 'checkbox' },
+                    language: { type: 'text' },
+                },
+                props: {},
+            },
+            ErrorDialog: {
+                component: ErrorDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    title: { type: 'text' },
+                    text: { type: 'text' },
+                },
+                props: {},
+            },
+            MessageDialog: {
+                component: MessageDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    title: { type: 'text' },
+                    text: { type: 'text' },
+                },
+                props: {},
+            },
+            SelectIDDialog: {
+                component: SelectIDDialog,
+                custom: true,
+                dialog: true,
+                options: {},
+                props: {},
+            },
+            SimpleCronDialog: {
+                component: SimpleCronDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    title: { type: 'text' },
+                    cron: { type: 'text' },
+                    cancel: { type: 'text' },
+                    ok: { type: 'text' },
+                    simple: { type: 'checkbox' },
+                    language: { type: 'text' },
+                },
+                props: {},
+            },
+            TextInputDialog: {
+                component: TextInputDialog,
+                custom: true,
+                dialog: true,
+                options: {
+                    titleText: { type: 'text' },
+                    promptText: { type: 'text' },
+                    labelText: { type: 'text' },
+                    cancelText: { type: 'text' },
+                    applyText: { type: 'text' },
+                    type: { type: 'text' },
+                    input: { type: 'text' },
+                },
+                props: {},
+            },
+        })
 
     componentDidMount() {
         super.componentDidMount();
@@ -294,7 +557,7 @@ class App extends GenericApp {
     }
 
     setComponent = component => {
-        const comp = this.components[component];
+        const comp = this.getComponents()[component];
         const options = {};
         let example = '';
 
@@ -309,9 +572,18 @@ class App extends GenericApp {
                 options.value = comp.value;
             }
             example = comp.example;
+            if (!example) {
+                example = `<${component}\n  ${
+                    Object.keys(comp.props).map(key => `${key}=""`).join('\n  ')
+                }\n  ${
+                    Object.keys(comp.options).map(key => `${key}=""`).join('\n  ')
+                } />`;
+            }
         }
 
-        this.setState({ component, error: false, options, example });
+        this.setState({
+            component, error: false, options, example,
+        });
         window.localStorage.setItem('component', component);
     }
 
@@ -343,8 +615,9 @@ class App extends GenericApp {
 
             options = Object.keys(comp.options).map(option => (
                 (item, _option) => {
+                    let input = null;
                     if (item.type === 'checkbox') {
-                        return <FormControlLabel
+                        input = <FormControlLabel
                             control={<Checkbox
                                 value={!!this.state.options[option]}
                                 onChange={() => {
@@ -355,8 +628,8 @@ class App extends GenericApp {
                             />}
                             label={_option}
                         />;
-                    } else if (item.type === 'text') {
-                        return <TextField
+                    } if (item.type === 'text') {
+                        input = <TextField
                             className={this.props.classes.optionItem}
                             label={_option}
                             variant="standard"
@@ -367,8 +640,8 @@ class App extends GenericApp {
                                 this.setState({ options: _options });
                             }}
                         />;
-                    } else if (item.type === 'options') {
-                        return <FormControl>
+                    } if (item.type === 'options') {
+                        input = <FormControl>
                             <InputLabel>{_option}</InputLabel>
                             <Select
                                 value={this.state.options[option]}
@@ -383,7 +656,7 @@ class App extends GenericApp {
                         </FormControl>;
                     }
 
-                    return null;
+                    return input ? <span className={this.props.classes.optionInput}>{input}</span> : null;
                 })(comp.options[option], option));
 
             const props = { ...comp.props, ...this.state.options };
@@ -405,13 +678,13 @@ class App extends GenericApp {
             }
         }
 
-        return <div className={ this.props.classes.componentOptionsDiv }>
-            <div className={ this.props.classes.componentDiv }>
+        return <div className={this.props.classes.componentOptionsDiv}>
+            <div className={this.props.classes.componentDiv}>
                 {comp}
             </div>
-            <div className={ this.props.classes.optionsDiv }>
-                <div className={ this.props.classes.optionsTitle }>{I18n.t('Options')}</div>
-                {this.state.example ? <Fab color="primary" className={ this.props.classes.optionsGithub } size="small" onClick={() => this.setState({openDialog: true })}>
+            <div className={this.props.classes.optionsDiv}>
+                <div className={this.props.classes.optionsTitle}>{I18n.t('Options')}</div>
+                {this.state.example ? <Fab color="primary" className={this.props.classes.optionsGithub} size="small" onClick={() => this.setState({ openDialog: true })}>
                     <GitHubIcon />
                 </Fab> : null }
                 {options}
@@ -434,16 +707,23 @@ class App extends GenericApp {
                 <div className={this.props.classes.app}>
                     <AppBar position="static">
                         <Toolbar variant="dense">
-                            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>{
-                                I18n.t('Adapter react')
-                            }</Typography>
+                            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                                {
+                                    I18n.t('Adapter react')
+                                }
+                            </Typography>
+                            <ToggleThemeMenu
+                                toggleTheme={() => this.toggleTheme()}
+                                themeName={this.state.themeName}
+                                t={I18n.t}
+                            />
                         </Toolbar>
                     </AppBar>
 
                     <Stack direction="row" spacing={2} className={this.props.classes.stack}>
                         <div className={this.props.classes.menu}>
                             <MenuList>
-                                {Object.keys(this.components).map(name => <MenuItem
+                                {Object.keys(this.getComponents()).map(name => <MenuItem
                                     key={name}
                                     selected={name === this.state.component}
                                     onClick={e => this.setComponent(name)}
@@ -454,7 +734,7 @@ class App extends GenericApp {
                         </div>
                         <div className={this.props.classes.component}>
                             <h2>
-                                {this.components[this.state.component]
+                                {this.getComponents()[this.state.component]
                                     ? this.state.component
                                     : I18n.t('Select component')}
                             </h2>
@@ -466,7 +746,7 @@ class App extends GenericApp {
                                     </div>
                                     <pre>{this.state.errorText.stack.toString()}</pre>
                                 </>
-                                : this.renderComponentAndOptions(this.components[this.state.component])}
+                                : this.renderComponentAndOptions(this.getComponents()[this.state.component])}
                         </div>
                     </Stack>
                 </div>
