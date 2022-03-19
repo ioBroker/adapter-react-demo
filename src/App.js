@@ -384,6 +384,7 @@ class App extends GenericApp {
                     lang: I18n.lang,
                     t: I18n.t,
                     socket: this.socket,
+                    columns: ['role', 'func', 'val', 'name'],
                 },
                 example:
 `<ObjectBrowser
