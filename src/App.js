@@ -25,7 +25,6 @@ import withStyles from '@mui/styles/withStyles';
 
 import copy from 'copy-to-clipboard';
 import GenericApp from './adapter-react-v5/src/GenericApp';
-import DialogWrapper from './Dialog';
 import Connection from './ConnectionSimulate';
 import I18n from './adapter-react-v5/src/i18n';
 
@@ -227,7 +226,23 @@ class App extends GenericApp {
             FileBrowser: {
                 component: FileBrowser,
                 custom: true,
-                options: {},
+                options: {
+                    imagePrefix: { type: 'text' },
+                    selected: { type: 'text' },
+                    filterByType: { type: 'text' },
+                    ready: { type: 'checkbox' },
+                    expertMode: { type: 'checkbox' },
+                    showToolbar: { type: 'checkbox' },
+                    allowUpload: { type: 'checkbox' },
+                    allowDownload: { type: 'checkbox' },
+                    allowCreateFolder: { type: 'checkbox' },
+                    allowDelete: { type: 'checkbox' },
+                    allowView: { type: 'checkbox' },
+                    showExpertButton: { type: 'checkbox' },
+                    viewType: { type: 'checkbox' },
+                    showViewTypeButton: { type: 'checkbox' },
+                    tileView: { type: 'checkbox' },
+                },
                 props: {
                     socket: this.socket,
                     ready: true,
@@ -274,7 +289,7 @@ class App extends GenericApp {
                 options: {
                     color: { type: 'text' },
                     title: { type: 'text' },
-                    src: { type: 'text' },
+                    src: { type: 'text', default: './adapter/admin/admin.png' },
                     imagePrefix: { type: 'text' },
                 },
                 props: {},
@@ -307,7 +322,7 @@ class App extends GenericApp {
                 custom: true,
                 options: {
                     color: { type: 'text' },
-                    src: { type: 'text' },
+                    src: { type: 'text', default: './adapter/admin/admin.png' },
                     imagePrefix: { type: 'text' },
                 },
                 props: {},
@@ -316,7 +331,7 @@ class App extends GenericApp {
                 component: Loader,
                 custom: true,
                 options: {
-                    size: { type: 'text' },
+                    size: { type: 'number' },
                 },
                 props: {
                     themeType: this.state.themeType,
@@ -331,6 +346,14 @@ class App extends GenericApp {
                     common: {},
                     instance: '',
                 },
+                example:
+`<Logo
+    instance={this.props.instance}
+    common={this.props.common}
+    native={this.props.native}
+    onError={text => this.setState({errorText: text})}
+    onLoad={this.props.onLoad}
+/>`,
             },
             ObjectBrowser: {
                 component: ObjectBrowser,
@@ -342,7 +365,7 @@ class App extends GenericApp {
                     themeType: { type: 'text' },
                     selected: { type: 'text' },
                     dateFormat: { type: 'text' },
-                    levelPadding: { type: 'text' },
+                    levelPadding: { type: 'number' },
 
                     showExpertButton: { type: 'checkbox' },
                     expertMode: { type: 'checkbox' },
@@ -362,13 +385,46 @@ class App extends GenericApp {
                     t: I18n.t,
                     socket: this.socket,
                 },
+                example:
+`<ObjectBrowser
+    foldersFirst={ this.props.foldersFirst }
+    imagePrefix={ this.props.imagePrefix || this.props.prefix } // prefix is for back compatibility
+    defaultFilters={ this.filters }
+    dialogName={this.dialogName}
+    showExpertButton={ this.props.showExpertButton !== undefined ? this.props.showExpertButton : true }
+    style={ {width: '100%', height: '100%'} }
+    columns={ this.props.columns || ['name', 'type', 'role', 'room', 'func', 'val'] }
+    types={ this.props.types || ['state'] }
+    t={ I18n.t }
+    lang={ this.props.lang || I18n.getLanguage() }
+    socket={ this.props.socket }
+    selected={ this.state.selected }
+    multiSelect={ this.props.multiSelect }
+    notEditable={ this.props.notEditable === undefined ? true : this.props.notEditable }
+    name={ this.state.name }
+    themeName={ this.props.themeName }
+    themeType={ this.props.themeType }
+    customFilter={ this.props.customFilter }
+    onFilterChanged={ filterConfig => {
+    this.filters = filterConfig;
+    window.localStorage.setItem(this.dialogName, JSON.stringify(filterConfig));
+    } }
+    onSelect={ (selected, name, isDouble) => {
+    if (JSON.stringify(selected) !== JSON.stringify(this.state.selected)) {
+        this.setState({selected, name}, () =>
+            isDouble && this.handleOk());
+    } else if (isDouble) {
+        this.handleOk();
+    }
+    } }
+/>`,
             },
             SaveCloseButtons: {
                 component: SaveCloseButtons,
                 custom: true,
                 options: {
                     dense: { type: 'checkbox' },
-                    paddingLeft: { type: 'text' },
+                    paddingLeft: { type: 'number' },
                     noTextOnButtons: { type: 'checkbox' },
                     isIFrame: { type: 'checkbox' },
                     changed: { type: 'checkbox' },
@@ -439,6 +495,53 @@ class App extends GenericApp {
                     columns: treeColumns,
                     data: treeData,
                 },
+                example:
+`<TreeTable
+    columns={this.columns}
+    data={this.state.data}
+    onUpdate={(newData, oldData) => {
+        const data = JSON.parse(JSON.stringify(this.state.data));
+        
+        // Added new line
+        if (newData === true) {
+            // find unique ID
+            let i = 1;
+            let id = 'line_' + i;
+
+            // eslint-disable-next-line
+            while(this.state.data.find(item => item.id === id)) {
+                i++;
+                id = 'line_' + i;
+            }
+
+            data.push({
+                id,
+                name: I18n.t('New resource') + '_' + i,
+                color: '',
+                icon: '',
+                unit: '',
+                price: 0,
+            });
+        } else {
+            // existing line was modifed
+            const pos = this.state.data.indexOf(oldData);
+            if (pos !== -1) {
+                Object.keys(newData).forEach(attr => data[pos][attr] = newData[attr]);
+            }
+        }
+
+        this.setState({data});
+    }}
+    onDelete={oldData => {
+        console.log('Delete: ' + JSON.stringify(oldData));
+        const pos = this.state.data.indexOf(oldData);
+        if (pos !== -1) {
+            const data = JSON.parse(JSON.stringify(this.state.data));
+            data.splice(pos, 1);
+            this.setState({data});
+        }
+    }}
+/>`,
             },
             ComplexCronDialog: {
                 component: ComplexCronDialog,
@@ -464,11 +567,24 @@ class App extends GenericApp {
                     text: { type: 'text' },
                     ok: { type: 'text' },
                     cancel: { type: 'text' },
-                    suppressQuestionMinutes: { type: 'text' },
+                    suppressQuestionMinutes: { type: 'number' },
                     suppressText: { type: 'text' },
                     dialogName: { type: 'text' },
                 },
                 props: {},
+                example:
+`<ConfirmDialog
+    title={ I18n.t('Scene will be overwritten.') }
+    text={ I18n.t('All data will be lost. Confirm?') }
+    ok={ I18n.t('Yes') }
+    cancel={ I18n.t('Cancel') }
+    suppressQuestionMinutes={5}
+    dialogName="myConfirmDialogThatCouldBeSuppressed"
+    suppressText={I18n.t('Suppress question for next %s minutes', 5)}
+    onClose={isYes => {
+        this.setState({ confirmDialog: false} );
+    }}
+/>`,
             },
             CronDialog: {
                 component: CronDialog,
@@ -509,8 +625,43 @@ class App extends GenericApp {
                 component: SelectIDDialog,
                 custom: true,
                 dialog: true,
-                options: {},
-                props: {},
+                options: {
+                    dialogName: { type: 'text' },
+                    title: { type: 'text' },
+                    lang: { type: 'text' },
+                    selected: { type: 'text' },
+                    cancel: { type: 'text' },
+                    imagePrefix: { type: 'text' },
+                    dateFormat: { type: 'text' },
+                    themeName: { type: 'text' },
+                    themeType: { type: 'text' },
+                    ok: { type: 'text' },
+                    notEditable: { type: 'checkbox' },
+                    foldersFirst: { type: 'checkbox' },
+                    isFloatComma: { type: 'checkbox' },
+                    statesOnly: { type: 'checkbox' },
+                    showExpertButton: { type: 'checkbox' },
+                    multiSelect: { type: 'checkbox' },
+                },
+                props: {
+                    lang: I18n.lang,
+                    t: I18n.t,
+                    socket: this.socket,
+                },
+                example:
+`<SelectIDDialog
+    key="tableSelect"
+    imagePrefix="../.."
+    dialogName={this.props.adapterName}
+    themeType={this.props.themeType}
+    socket={this.props.socket}
+    statesOnly={true}
+    selected={this.state.selectIdValue}
+    onClose={() => this.setState({showSelectId: false})}
+    onOk={(selected, name) => {
+        this.setState({showSelectId: false, selectIdValue: selected});                 
+    }}
+/>`,
             },
             SimpleCronDialog: {
                 component: SimpleCronDialog,
@@ -628,15 +779,16 @@ class App extends GenericApp {
                             />}
                             label={_option}
                         />;
-                    } if (item.type === 'text') {
+                    } if (item.type === 'text' || item.type === 'number') {
                         input = <TextField
                             className={this.props.classes.optionItem}
                             label={_option}
+                            type={item.type}
                             variant="standard"
                             value={this.state.options[option]}
                             onChange={e => {
                                 const _options = JSON.parse(JSON.stringify(this.state.options));
-                                _options[_option] = e.target.value;
+                                _options[_option] = item.type === 'number' ? parseInt(e.target.value) : e.target.value;
                                 this.setState({ options: _options });
                             }}
                         />;
@@ -651,12 +803,12 @@ class App extends GenericApp {
                                     this.setState({ options: _options });
                                 }}
                             >
-                                {item.options.map(it => <MenuItem value={it.value}>{it.title}</MenuItem>)}
+                                {item.options.map(it => <MenuItem key={it.value} value={it.value}>{it.title}</MenuItem>)}
                             </Select>
                         </FormControl>;
                     }
 
-                    return input ? <span className={this.props.classes.optionInput}>{input}</span> : null;
+                    return input ? <span className={this.props.classes.optionInput} key={option}>{input}</span> : null;
                 })(comp.options[option], option));
 
             const props = { ...comp.props, ...this.state.options };
