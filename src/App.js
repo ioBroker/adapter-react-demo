@@ -119,7 +119,7 @@ const styles = theme => ({
         overflowY: 'auto',
     },
     stack: {
-        height: 'calc(100% - 80px)',
+        height: 'calc(100% - 52px)',
     },
     menu: {
         overflowY: 'auto', height: '100%', width: 320,
