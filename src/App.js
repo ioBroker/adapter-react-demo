@@ -54,6 +54,7 @@ import MessageDialog from './adapter-react-v5/src/Dialogs/Message';
 import SelectIDDialog from './adapter-react-v5/src/Dialogs/SelectID';
 import SimpleCronDialog from './adapter-react-v5/src/Dialogs/SimpleCron';
 import TextInputDialog from './adapter-react-v5/src/Dialogs/TextInput';
+import Example from './Example';
 
 const treeData = [
     {
@@ -134,11 +135,13 @@ const styles = theme => ({
     },
     componentDiv: {
         height: 'calc(100% - 200px)',
+        overflowY: 'auto',
     },
     optionsDiv: {
         borderTop: '1px solid grey',
         height: 200,
         position: 'relative',
+        overflowY: 'auto',
     },
     optionsTitle: {
         fontSize: 20,
@@ -297,6 +300,7 @@ class App extends GenericApp {
             IconPicker: {
                 component: IconPicker,
                 custom: true,
+                onChange: true,
                 options: {
                     previewClassName: { type: 'text' },
                     label: { type: 'text' },
@@ -311,6 +315,7 @@ class App extends GenericApp {
             IconSelector: {
                 component: IconSelector,
                 custom: true,
+                onChange: true,
                 options: {
                     onlyRooms: { type: 'checkbox' },
                     onlyDevices: { type: 'checkbox' },
@@ -741,16 +746,13 @@ class App extends GenericApp {
 
     renderCodeDialog() {
         return <Dialog
+            maxWidth="md"
             open={this.state.openDialog}
             onClose={() => this.setState({ openDialog: false })}
         >
             <DialogTitle>{ I18n.t('Usage example') }</DialogTitle>
             <DialogContent>
-                <DialogContentText>
-                    <pre>
-                        { this.state.example }
-                    </pre>
-                </DialogContentText>
+                <Example code={this.state.example} themeName={this.state.themeName} />
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => copy(this.state.example)} variant="outlined">{I18n.t('Copy to clipboard')}</Button>
