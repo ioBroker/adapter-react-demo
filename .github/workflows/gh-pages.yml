@@ -16,7 +16,7 @@ jobs:
         run: |
           npm install
           npm ci
-          CI=false npm run build
+          CI=false PUBLIC_URL="." npm run build
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.2.5
