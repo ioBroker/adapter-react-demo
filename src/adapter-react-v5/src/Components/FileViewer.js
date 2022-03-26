@@ -17,7 +17,7 @@ import {FaCopy as CopyIcon} from 'react-icons/fa';
 import CloseIcon from '@mui/icons-material/Close';
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
-const withWidth = () => (WrappedComponent) => (props) => <WrappedComponent {...props} width="xs" />;
+const withWidth = () => WrappedComponent => props => <WrappedComponent {...props} width="xs" />;
 
 const styles = theme => ({
     dialog: {
@@ -36,7 +36,7 @@ const styles = theme => ({
         width: 'auto',
         height: 'calc(100% - 5px)',
         objectFit: 'contain',
-    },
+    }
 });
 
 export const EXTENSIONS = {
@@ -105,15 +105,19 @@ class FileViewer extends React.Component {
                 className={ this.props.classes.textarea }
                 multiline
                 value={ this.state.code }
-                readOnly
+                InputProps={{
+                    readOnly: true,
+                }}
             />;
         } else  if (this.state.text !== null) {
             return <TextField
                 variant="standard"
                 className={ this.props.classes.textarea }
-                value={ this.state.text }
+                value={ this.state.code }
                 multiline
-                readOnly
+                InputProps={{
+                    readOnly: true,
+                }}
             />;
         }
     }
@@ -121,7 +125,7 @@ class FileViewer extends React.Component {
     render() {
         return <Dialog
             className={ this.props.classes.dialog }
-            open={ this.props.href }
+            open={ !!this.props.href }
             onClose={ () => this.props.onClose() }
             fullWidth
             fullScreen={this.props.fullScreen !== undefined ? this.props.fullScreen : true}
@@ -148,6 +152,7 @@ class FileViewer extends React.Component {
 
 FileViewer.propTypes = {
     t: PropTypes.func,
+
     onClose: PropTypes.func,
     href: PropTypes.string.isRequired,
     fullScreen: PropTypes.bool,

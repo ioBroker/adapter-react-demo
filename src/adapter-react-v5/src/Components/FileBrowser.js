@@ -1629,9 +1629,9 @@ FileBrowser.defaultProps = {
 FileBrowser.propTypes = {
     style: PropTypes.object,
     className: PropTypes.string,
-    t: PropTypes.func,
-    lang: PropTypes.string,
-    socket: PropTypes.object,
+    t: PropTypes.func.isRequired,
+    lang: PropTypes.string.isRequired,
+    socket: PropTypes.object.isRequired,
     ready: PropTypes.bool,
     expertMode: PropTypes.bool,
     showToolbar: PropTypes.bool,
@@ -1649,7 +1649,7 @@ FileBrowser.propTypes = {
     tileView: PropTypes.bool,
     filterFiles: PropTypes.array, // like ['png', 'svg', 'bmp', 'jpg', 'jpeg']
     filterByType: PropTypes.string, // images, code or txt from FileViewer.EXTENSIONS
-    onSelect: PropTypes.func, // function (id, isDoubleClick)
+    onSelect: PropTypes.func.isRequired, // function (id, isDoubleClick)
 };
 
 /** @type {typeof FileBrowser} */

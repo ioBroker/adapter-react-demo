@@ -158,6 +158,13 @@ const styles = theme => ({
         display: 'inline-block',
         width: 240,
     },
+    image: {
+        width: 64,
+        height: 64,
+    },
+    textWithIcon: {
+        width: 100,
+    },
 });
 
 class App extends GenericApp {
@@ -225,6 +232,11 @@ class App extends GenericApp {
                     language: { type: 'text' },
                 },
                 props: {},
+                example: `<ComplexCron
+    cronExpression={this.state.cron}
+    onChange={cron => this.setState({cron})}
+    language="en"
+/>`
             },
             FileBrowser: {
                 component: FileBrowser,
@@ -251,6 +263,11 @@ class App extends GenericApp {
                     ready: true,
                     t: I18n.t,
                 },
+                example: `<FileBrowser
+    selected={this.state.currentFile} 
+    t={I18n.t}
+    onClose={ () => this.setState({showViewer: false}) }
+/>`,
             },
             FileViewer: {
                 component: FileViewer,
@@ -304,7 +321,6 @@ class App extends GenericApp {
                 options: {
                     previewClassName: { type: 'text' },
                     label: { type: 'text' },
-                    name: { type: 'text' },
                     disabled: { type: 'checkbox' },
 
                     onlyRooms: { type: 'checkbox' },
@@ -329,6 +345,7 @@ class App extends GenericApp {
                     color: { type: 'text' },
                     src: { type: 'text', default: './adapter/admin/admin.png' },
                     imagePrefix: { type: 'text' },
+                    className: {type: 'text', default: this.props.classes.image}
                 },
                 props: {},
             },
@@ -347,9 +364,15 @@ class App extends GenericApp {
                 custom: true,
                 options: {},
                 props: {
-                    native: {},
-                    common: {},
-                    instance: '',
+                    native: {
+                        example: true,
+                    },
+                    common: {
+                        name: 'example',
+                        icon: './adapter/echarts/echarts.png',
+                        readme: 'https://www.iobroker.net/#de/adapters/adapterref/iobroker.cloud/README.md',
+                    },
+                    instance: 1,
                 },
                 example:
 `<Logo
@@ -444,7 +467,6 @@ class App extends GenericApp {
                 custom: true,
                 options: {
                     schedule: { type: 'text' },
-                    language: { type: 'text' },
                 },
                 props: {},
             },
@@ -453,7 +475,7 @@ class App extends GenericApp {
                 custom: true,
                 options: {
                     themeType: { type: 'text' },
-                    value: { type: 'text' },
+                    value: { type: 'text', default: 'system.user.admin' },
                     label: { type: 'text' },
                     className: { type: 'text' },
                     removePrefix: { type: 'text' },
@@ -461,19 +483,58 @@ class App extends GenericApp {
                     fullWidth: { type: 'checkbox' },
                     allowNone: { type: 'checkbox' },
                 },
-                props: { options: [], list: [] },
+                onChange: true,
+                props: {
+                    list: [
+                        {
+                            _id: 'system.user.admin',
+                            common: {
+                                icon: 'data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjQ4NnB0IiB2aWV3Qm94PSIwIDEzMCA0ODYuNzA2MjUgNDg2IiB3aWR0aD0iNDg2cHQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogICAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJtMzU3LjYzNjcxOSAyNDQuMjEwOTM4Yy0xLjkwNjI1LTQxLjMyODEyNi0yNS43NjE3MTktNzYuOTIxODc2LTYwLjE5NTMxMy05NS4zNjMyODItMi43MTQ4NDQtMS40ODA0NjgtNS41MTU2MjUtMi44Mzk4NDQtOC4zNzEwOTQtNC4wNzQyMTgtMTMuOTQxNDA2LTYuMDYyNS0yOS4zMjgxMjQtOS40MjU3ODItNDUuNTAzOTA2LTkuNDI1NzgyLTYwLjc1IDAtMTEwLjM1MTU2MiA0Ny40NTMxMjUtMTEzLjkxMDE1NiAxMDcuMzI4MTI1bC4wMzEyNS0uMDA3ODEydi4yMDMxMjVjMCAyLjIxMDkzNy0uMTA1NDY5IDEyLjA5NzY1Ni0uMTA1NDY5IDEyLjA5NzY1NmwtMS42OTkyMTkgMy43NzM0MzhoMTEuMzcxMDk0YzQuMjczNDM4LTE0IDE3LjM5MDYyNS0yMy41NzAzMTMgMzIuODcxMDk0LTIzLjU3MDMxMyAxOC45NDUzMTIgMCAzNC4zNTkzNzUgMTUuODI4MTI1IDM0LjM1OTM3NSAzNC43NzM0MzcgMCAxOC45NDE0MDctMTUuNDE0MDYzIDM0LjA1MDc4Mi0zNC4zNTkzNzUgMzQuMDUwNzgyLTE4LjEzNjcxOSAwLTMzLjAzMTI1LTE0LjI1MzkwNi0zNC4yNjU2MjUtMzIuMjUzOTA2aC0xMy41NzAzMTNjLS4yODkwNjIgMC0uNTYyNS40NjA5MzctLjgzOTg0My40MjE4NzRsLTE0LjI3MzQzOCAzOS44NjcxODhjLTIuMDAzOTA2IDUuNTU4NTk0IDIuMTEzMjgxIDExLjcxMDkzOCA4LjAxOTUzMSAxMS43MTA5MzhoMTIuMjkyOTY5bC0uMDkzNzUgNjMuNDg0Mzc0YzAgMTIuNTM1MTU3IDEwLjE2NDA2MyAyMi41MTU2MjYgMjIuNjk5MjE5IDIyLjUxNTYyNmg0MC41OTM3NXY1OS42OTE0MDZjMCA5LjMwMDc4MSA5LjM0Mzc1IDE2LjMwODU5NCAxOC42NDQ1MzEgMTYuMzA4NTk0aDEwNC40MzM1OTRjOS4zMDA3ODEgMCAxNi45MjE4NzUtNy4wMDc4MTMgMTYuOTIxODc1LTE2LjMwODU5NHYtMTE5LjkxNzk2OWMwLTE2LjM1NTQ2OSA0LjMxNjQwNi0zMi4zMjgxMjUgMTEuOTYwOTM4LTQ2Ljc5Mjk2OSA3Ljk4NDM3NC0xNS4xMTMyODEgMTIuNjU2MjUtMzIuMjI2NTYyIDEzLjA5Mzc1LTUwLjQwNjI1LjAxOTUzMS0uOTEwMTU2LjAyNzM0My0xLjg0Mzc1LjAyNzM0My0yLjc3NzM0NCAwLTEuNzgxMjUtLjA1MDc4MS0zLjU2NjQwNi0uMTMyODEyLTUuMzI4MTI0em0tMTEyLjIzMDQ2OS04LjQ3MjY1N2gtOS43MTg3NXY5Ljc5Mjk2OWMwIDMuNDE3OTY5LTMuMDgyMDMxIDYuMTg3NS02LjUgNi4xODc1LTMuNDE0MDYyIDAtNi41LTIuNzY5NTMxLTYuNS02LjE4NzV2LTkuNzkyOTY5aC04LjgwMDc4MWMtMy40MTc5NjkgMC02LjE4NzUtMy4wODIwMzEtNi4xODc1LTYuNSAwLTMuNDE0MDYyIDIuNzY5NTMxLTYuNSA2LjE4NzUtNi41aDguODAwNzgxdi04LjcyMjY1NmMwLTMuNDE3OTY5IDMuMDg1OTM4LTYuMTg3NSA2LjUtNi4xODc1IDMuNDE3OTY5IDAgNi41IDIuNzY5NTMxIDYuNSA2LjE4NzV2OC43MjI2NTZoOS43MTg3NWMzLjQxNDA2MiAwIDYuMTg3NSAzLjA4NTkzOCA2LjE4NzUgNi41IDAgMy40MTc5NjktMi43NzM0MzggNi41LTYuMTg3NSA2LjV6bTAgMCIvPg0KICAgIDxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0ibTE4Ny42OTUzMTIgMjg1Ljg3NWMzLjkzNzUtMy45ODA0NjkgNi40MTQwNjMtOS40NDkyMTkgNi40MTQwNjMtMTUuNTIzNDM4IDAtMTIuMTI4OTA2LTkuODU1NDY5LTIxLjk4MDQ2OC0yMS45ODQzNzUtMjEuOTgwNDY4LTYuMDA3ODEyIDAtMTEuNDcyNjU2IDIuNDEwMTU2LTE1LjQ1NzAzMSA2LjM0NzY1Ni00LjAyMzQzOCA0LjAwMzkwNi02LjUyMzQzOCA5LjUzOTA2Mi02LjUyMzQzOCAxNS42MzY3MTkgMCAxMi4xMjUgOS44NTU0NjkgMjEuOTgwNDY5IDIxLjk4MDQ2OSAyMS45ODA0NjkgNi4wNzgxMjUgMCAxMS41ODU5MzgtMi40NzY1NjMgMTUuNTcwMzEyLTYuNDYwOTM4em0wIDAiLz4NCjwvc3ZnPg==',
+                                color: 'red',
+                                name: 'Admin'
+                            }
+                        },
+                        {
+                            _id: 'system.user.user',
+                            common: {
+                                icon: 'data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjQ4NnB0IiB2aWV3Qm94PSIwIDEzMCA0ODYuNzA2MjUgNDg2IiB3aWR0aD0iNDg2cHQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogICAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJtMzU3LjYzNjcxOSAyNDQuMjEwOTM4Yy0xLjkwNjI1LTQxLjMyODEyNi0yNS43NjE3MTktNzYuOTIxODc2LTYwLjE5NTMxMy05NS4zNjMyODItMi43MTQ4NDQtMS40ODA0NjgtNS41MTU2MjUtMi44Mzk4NDQtOC4zNzEwOTQtNC4wNzQyMTgtMTMuOTQxNDA2LTYuMDYyNS0yOS4zMjgxMjQtOS40MjU3ODItNDUuNTAzOTA2LTkuNDI1NzgyLTYwLjc1IDAtMTEwLjM1MTU2MiA0Ny40NTMxMjUtMTEzLjkxMDE1NiAxMDcuMzI4MTI1bC4wMzEyNS0uMDA3ODEydi4yMDMxMjVjMCAyLjIxMDkzNy0uMTA1NDY5IDEyLjA5NzY1Ni0uMTA1NDY5IDEyLjA5NzY1NmwtMS42OTkyMTkgMy43NzM0MzhoMTEuMzcxMDk0YzQuMjczNDM4LTE0IDE3LjM5MDYyNS0yMy41NzAzMTMgMzIuODcxMDk0LTIzLjU3MDMxMyAxOC45NDUzMTIgMCAzNC4zNTkzNzUgMTUuODI4MTI1IDM0LjM1OTM3NSAzNC43NzM0MzcgMCAxOC45NDE0MDctMTUuNDE0MDYzIDM0LjA1MDc4Mi0zNC4zNTkzNzUgMzQuMDUwNzgyLTE4LjEzNjcxOSAwLTMzLjAzMTI1LTE0LjI1MzkwNi0zNC4yNjU2MjUtMzIuMjUzOTA2aC0xMy41NzAzMTNjLS4yODkwNjIgMC0uNTYyNS40NjA5MzctLjgzOTg0My40MjE4NzRsLTE0LjI3MzQzOCAzOS44NjcxODhjLTIuMDAzOTA2IDUuNTU4NTk0IDIuMTEzMjgxIDExLjcxMDkzOCA4LjAxOTUzMSAxMS43MTA5MzhoMTIuMjkyOTY5bC0uMDkzNzUgNjMuNDg0Mzc0YzAgMTIuNTM1MTU3IDEwLjE2NDA2MyAyMi41MTU2MjYgMjIuNjk5MjE5IDIyLjUxNTYyNmg0MC41OTM3NXY1OS42OTE0MDZjMCA5LjMwMDc4MSA5LjM0Mzc1IDE2LjMwODU5NCAxOC42NDQ1MzEgMTYuMzA4NTk0aDEwNC40MzM1OTRjOS4zMDA3ODEgMCAxNi45MjE4NzUtNy4wMDc4MTMgMTYuOTIxODc1LTE2LjMwODU5NHYtMTE5LjkxNzk2OWMwLTE2LjM1NTQ2OSA0LjMxNjQwNi0zMi4zMjgxMjUgMTEuOTYwOTM4LTQ2Ljc5Mjk2OSA3Ljk4NDM3NC0xNS4xMTMyODEgMTIuNjU2MjUtMzIuMjI2NTYyIDEzLjA5Mzc1LTUwLjQwNjI1LjAxOTUzMS0uOTEwMTU2LjAyNzM0My0xLjg0Mzc1LjAyNzM0My0yLjc3NzM0NCAwLTEuNzgxMjUtLjA1MDc4MS0zLjU2NjQwNi0uMTMyODEyLTUuMzI4MTI0em0tMTEyLjIzMDQ2OS04LjQ3MjY1N2gtOS43MTg3NXY5Ljc5Mjk2OWMwIDMuNDE3OTY5LTMuMDgyMDMxIDYuMTg3NS02LjUgNi4xODc1LTMuNDE0MDYyIDAtNi41LTIuNzY5NTMxLTYuNS02LjE4NzV2LTkuNzkyOTY5aC04LjgwMDc4MWMtMy40MTc5NjkgMC02LjE4NzUtMy4wODIwMzEtNi4xODc1LTYuNSAwLTMuNDE0MDYyIDIuNzY5NTMxLTYuNSA2LjE4NzUtNi41aDguODAwNzgxdi04LjcyMjY1NmMwLTMuNDE3OTY5IDMuMDg1OTM4LTYuMTg3NSA2LjUtNi4xODc1IDMuNDE3OTY5IDAgNi41IDIuNzY5NTMxIDYuNSA2LjE4NzV2OC43MjI2NTZoOS43MTg3NWMzLjQxNDA2MiAwIDYuMTg3NSAzLjA4NTkzOCA2LjE4NzUgNi41IDAgMy40MTc5NjktMi43NzM0MzggNi41LTYuMTg3NSA2LjV6bTAgMCIvPg0KICAgIDxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0ibTE4Ny42OTUzMTIgMjg1Ljg3NWMzLjkzNzUtMy45ODA0NjkgNi40MTQwNjMtOS40NDkyMTkgNi40MTQwNjMtMTUuNTIzNDM4IDAtMTIuMTI4OTA2LTkuODU1NDY5LTIxLjk4MDQ2OC0yMS45ODQzNzUtMjEuOTgwNDY4LTYuMDA3ODEyIDAtMTEuNDcyNjU2IDIuNDEwMTU2LTE1LjQ1NzAzMSA2LjM0NzY1Ni00LjAyMzQzOCA0LjAwMzkwNi02LjUyMzQzOCA5LjUzOTA2Mi02LjUyMzQzOCAxNS42MzY3MTkgMCAxMi4xMjUgOS44NTU0NjkgMjEuOTgwNDY5IDIxLjk4MDQ2OSAyMS45ODA0NjkgNi4wNzgxMjUgMCAxMS41ODU5MzgtMi40NzY1NjMgMTUuNTcwMzEyLTYuNDYwOTM4em0wIDAiLz4NCjwvc3ZnPg==',
+                                color: 'green',
+                                name: 'User'
+                            }
+                        }
+                    ]
+                },
             },
             TextWithIcon: {
                 component: TextWithIcon,
                 custom: true,
                 options: {
                     themeType: { type: 'text' },
-                    value: { type: 'text' },
-                    className: { type: 'text' },
+                    value: { type: 'text', default: 'system.user.admin' },
+                    className: { type: 'text', default: this.props.classes.textWithIcon },
                     title: { type: 'text' },
                     removePrefix: { type: 'text' },
                 },
-                props: {},
+                props: {
+                    list: [
+                        {
+                            _id: 'system.user.admin',
+                            common: {
+                                icon: 'data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjQ4NnB0IiB2aWV3Qm94PSIwIDEzMCA0ODYuNzA2MjUgNDg2IiB3aWR0aD0iNDg2cHQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogICAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJtMzU3LjYzNjcxOSAyNDQuMjEwOTM4Yy0xLjkwNjI1LTQxLjMyODEyNi0yNS43NjE3MTktNzYuOTIxODc2LTYwLjE5NTMxMy05NS4zNjMyODItMi43MTQ4NDQtMS40ODA0NjgtNS41MTU2MjUtMi44Mzk4NDQtOC4zNzEwOTQtNC4wNzQyMTgtMTMuOTQxNDA2LTYuMDYyNS0yOS4zMjgxMjQtOS40MjU3ODItNDUuNTAzOTA2LTkuNDI1NzgyLTYwLjc1IDAtMTEwLjM1MTU2MiA0Ny40NTMxMjUtMTEzLjkxMDE1NiAxMDcuMzI4MTI1bC4wMzEyNS0uMDA3ODEydi4yMDMxMjVjMCAyLjIxMDkzNy0uMTA1NDY5IDEyLjA5NzY1Ni0uMTA1NDY5IDEyLjA5NzY1NmwtMS42OTkyMTkgMy43NzM0MzhoMTEuMzcxMDk0YzQuMjczNDM4LTE0IDE3LjM5MDYyNS0yMy41NzAzMTMgMzIuODcxMDk0LTIzLjU3MDMxMyAxOC45NDUzMTIgMCAzNC4zNTkzNzUgMTUuODI4MTI1IDM0LjM1OTM3NSAzNC43NzM0MzcgMCAxOC45NDE0MDctMTUuNDE0MDYzIDM0LjA1MDc4Mi0zNC4zNTkzNzUgMzQuMDUwNzgyLTE4LjEzNjcxOSAwLTMzLjAzMTI1LTE0LjI1MzkwNi0zNC4yNjU2MjUtMzIuMjUzOTA2aC0xMy41NzAzMTNjLS4yODkwNjIgMC0uNTYyNS40NjA5MzctLjgzOTg0My40MjE4NzRsLTE0LjI3MzQzOCAzOS44NjcxODhjLTIuMDAzOTA2IDUuNTU4NTk0IDIuMTEzMjgxIDExLjcxMDkzOCA4LjAxOTUzMSAxMS43MTA5MzhoMTIuMjkyOTY5bC0uMDkzNzUgNjMuNDg0Mzc0YzAgMTIuNTM1MTU3IDEwLjE2NDA2MyAyMi41MTU2MjYgMjIuNjk5MjE5IDIyLjUxNTYyNmg0MC41OTM3NXY1OS42OTE0MDZjMCA5LjMwMDc4MSA5LjM0Mzc1IDE2LjMwODU5NCAxOC42NDQ1MzEgMTYuMzA4NTk0aDEwNC40MzM1OTRjOS4zMDA3ODEgMCAxNi45MjE4NzUtNy4wMDc4MTMgMTYuOTIxODc1LTE2LjMwODU5NHYtMTE5LjkxNzk2OWMwLTE2LjM1NTQ2OSA0LjMxNjQwNi0zMi4zMjgxMjUgMTEuOTYwOTM4LTQ2Ljc5Mjk2OSA3Ljk4NDM3NC0xNS4xMTMyODEgMTIuNjU2MjUtMzIuMjI2NTYyIDEzLjA5Mzc1LTUwLjQwNjI1LjAxOTUzMS0uOTEwMTU2LjAyNzM0My0xLjg0Mzc1LjAyNzM0My0yLjc3NzM0NCAwLTEuNzgxMjUtLjA1MDc4MS0zLjU2NjQwNi0uMTMyODEyLTUuMzI4MTI0em0tMTEyLjIzMDQ2OS04LjQ3MjY1N2gtOS43MTg3NXY5Ljc5Mjk2OWMwIDMuNDE3OTY5LTMuMDgyMDMxIDYuMTg3NS02LjUgNi4xODc1LTMuNDE0MDYyIDAtNi41LTIuNzY5NTMxLTYuNS02LjE4NzV2LTkuNzkyOTY5aC04LjgwMDc4MWMtMy40MTc5NjkgMC02LjE4NzUtMy4wODIwMzEtNi4xODc1LTYuNSAwLTMuNDE0MDYyIDIuNzY5NTMxLTYuNSA2LjE4NzUtNi41aDguODAwNzgxdi04LjcyMjY1NmMwLTMuNDE3OTY5IDMuMDg1OTM4LTYuMTg3NSA2LjUtNi4xODc1IDMuNDE3OTY5IDAgNi41IDIuNzY5NTMxIDYuNSA2LjE4NzV2OC43MjI2NTZoOS43MTg3NWMzLjQxNDA2MiAwIDYuMTg3NSAzLjA4NTkzOCA2LjE4NzUgNi41IDAgMy40MTc5NjktMi43NzM0MzggNi41LTYuMTg3NSA2LjV6bTAgMCIvPg0KICAgIDxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0ibTE4Ny42OTUzMTIgMjg1Ljg3NWMzLjkzNzUtMy45ODA0NjkgNi40MTQwNjMtOS40NDkyMTkgNi40MTQwNjMtMTUuNTIzNDM4IDAtMTIuMTI4OTA2LTkuODU1NDY5LTIxLjk4MDQ2OC0yMS45ODQzNzUtMjEuOTgwNDY4LTYuMDA3ODEyIDAtMTEuNDcyNjU2IDIuNDEwMTU2LTE1LjQ1NzAzMSA2LjM0NzY1Ni00LjAyMzQzOCA0LjAwMzkwNi02LjUyMzQzOCA5LjUzOTA2Mi02LjUyMzQzOCAxNS42MzY3MTkgMCAxMi4xMjUgOS44NTU0NjkgMjEuOTgwNDY5IDIxLjk4MDQ2OSAyMS45ODA0NjkgNi4wNzgxMjUgMCAxMS41ODU5MzgtMi40NzY1NjMgMTUuNTcwMzEyLTYuNDYwOTM4em0wIDAiLz4NCjwvc3ZnPg==',
+                                color: 'red',
+                                name: 'Admin',
+                            },
+                        },
+                        {
+                            _id: 'system.user.user',
+                            common: {
+                                icon: 'data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjQ4NnB0IiB2aWV3Qm94PSIwIDEzMCA0ODYuNzA2MjUgNDg2IiB3aWR0aD0iNDg2cHQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogICAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJtMzU3LjYzNjcxOSAyNDQuMjEwOTM4Yy0xLjkwNjI1LTQxLjMyODEyNi0yNS43NjE3MTktNzYuOTIxODc2LTYwLjE5NTMxMy05NS4zNjMyODItMi43MTQ4NDQtMS40ODA0NjgtNS41MTU2MjUtMi44Mzk4NDQtOC4zNzEwOTQtNC4wNzQyMTgtMTMuOTQxNDA2LTYuMDYyNS0yOS4zMjgxMjQtOS40MjU3ODItNDUuNTAzOTA2LTkuNDI1NzgyLTYwLjc1IDAtMTEwLjM1MTU2MiA0Ny40NTMxMjUtMTEzLjkxMDE1NiAxMDcuMzI4MTI1bC4wMzEyNS0uMDA3ODEydi4yMDMxMjVjMCAyLjIxMDkzNy0uMTA1NDY5IDEyLjA5NzY1Ni0uMTA1NDY5IDEyLjA5NzY1NmwtMS42OTkyMTkgMy43NzM0MzhoMTEuMzcxMDk0YzQuMjczNDM4LTE0IDE3LjM5MDYyNS0yMy41NzAzMTMgMzIuODcxMDk0LTIzLjU3MDMxMyAxOC45NDUzMTIgMCAzNC4zNTkzNzUgMTUuODI4MTI1IDM0LjM1OTM3NSAzNC43NzM0MzcgMCAxOC45NDE0MDctMTUuNDE0MDYzIDM0LjA1MDc4Mi0zNC4zNTkzNzUgMzQuMDUwNzgyLTE4LjEzNjcxOSAwLTMzLjAzMTI1LTE0LjI1MzkwNi0zNC4yNjU2MjUtMzIuMjUzOTA2aC0xMy41NzAzMTNjLS4yODkwNjIgMC0uNTYyNS40NjA5MzctLjgzOTg0My40MjE4NzRsLTE0LjI3MzQzOCAzOS44NjcxODhjLTIuMDAzOTA2IDUuNTU4NTk0IDIuMTEzMjgxIDExLjcxMDkzOCA4LjAxOTUzMSAxMS43MTA5MzhoMTIuMjkyOTY5bC0uMDkzNzUgNjMuNDg0Mzc0YzAgMTIuNTM1MTU3IDEwLjE2NDA2MyAyMi41MTU2MjYgMjIuNjk5MjE5IDIyLjUxNTYyNmg0MC41OTM3NXY1OS42OTE0MDZjMCA5LjMwMDc4MSA5LjM0Mzc1IDE2LjMwODU5NCAxOC42NDQ1MzEgMTYuMzA4NTk0aDEwNC40MzM1OTRjOS4zMDA3ODEgMCAxNi45MjE4NzUtNy4wMDc4MTMgMTYuOTIxODc1LTE2LjMwODU5NHYtMTE5LjkxNzk2OWMwLTE2LjM1NTQ2OSA0LjMxNjQwNi0zMi4zMjgxMjUgMTEuOTYwOTM4LTQ2Ljc5Mjk2OSA3Ljk4NDM3NC0xNS4xMTMyODEgMTIuNjU2MjUtMzIuMjI2NTYyIDEzLjA5Mzc1LTUwLjQwNjI1LjAxOTUzMS0uOTEwMTU2LjAyNzM0My0xLjg0Mzc1LjAyNzM0My0yLjc3NzM0NCAwLTEuNzgxMjUtLjA1MDc4MS0zLjU2NjQwNi0uMTMyODEyLTUuMzI4MTI0em0tMTEyLjIzMDQ2OS04LjQ3MjY1N2gtOS43MTg3NXY5Ljc5Mjk2OWMwIDMuNDE3OTY5LTMuMDgyMDMxIDYuMTg3NS02LjUgNi4xODc1LTMuNDE0MDYyIDAtNi41LTIuNzY5NTMxLTYuNS02LjE4NzV2LTkuNzkyOTY5aC04LjgwMDc4MWMtMy40MTc5NjkgMC02LjE4NzUtMy4wODIwMzEtNi4xODc1LTYuNSAwLTMuNDE0MDYyIDIuNzY5NTMxLTYuNSA2LjE4NzUtNi41aDguODAwNzgxdi04LjcyMjY1NmMwLTMuNDE3OTY5IDMuMDg1OTM4LTYuMTg3NSA2LjUtNi4xODc1IDMuNDE3OTY5IDAgNi41IDIuNzY5NTMxIDYuNSA2LjE4NzV2OC43MjI2NTZoOS43MTg3NWMzLjQxNDA2MiAwIDYuMTg3NSAzLjA4NTkzOCA2LjE4NzUgNi41IDAgMy40MTc5NjktMi43NzM0MzggNi41LTYuMTg3NSA2LjV6bTAgMCIvPg0KICAgIDxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0ibTE4Ny42OTUzMTIgMjg1Ljg3NWMzLjkzNzUtMy45ODA0NjkgNi40MTQwNjMtOS40NDkyMTkgNi40MTQwNjMtMTUuNTIzNDM4IDAtMTIuMTI4OTA2LTkuODU1NDY5LTIxLjk4MDQ2OC0yMS45ODQzNzUtMjEuOTgwNDY4LTYuMDA3ODEyIDAtMTEuNDcyNjU2IDIuNDEwMTU2LTE1LjQ1NzAzMSA2LjM0NzY1Ni00LjAyMzQzOCA0LjAwMzkwNi02LjUyMzQzOCA5LjUzOTA2Mi02LjUyMzQzOCAxNS42MzY3MTkgMCAxMi4xMjUgOS44NTU0NjkgMjEuOTgwNDY5IDIxLjk4MDQ2OSAyMS45ODA0NjkgNi4wNzgxMjUgMCAxMS41ODU5MzgtMi40NzY1NjMgMTUuNTcwMzEyLTYuNDYwOTM4em0wIDAiLz4NCjwvc3ZnPg==',
+                                color: 'green',
+                                name: 'User',
+                            },
+                        },
+                    ],
+                },
             },
             ToggleThemeMenu: {
                 component: ToggleThemeMenu,
@@ -563,6 +624,9 @@ class App extends GenericApp {
                     clearButton: { type: 'checkbox' },
                 },
                 props: {},
+                example: `
+                
+`
             },
             ConfirmDialog: {
                 component: ConfirmDialog,
@@ -575,7 +639,7 @@ class App extends GenericApp {
                     cancel: { type: 'text' },
                     suppressQuestionMinutes: { type: 'number' },
                     suppressText: { type: 'text' },
-                    dialogName: { type: 'text' },
+                    dialogName: { type: 'text', default: 'test'},
                 },
                 props: {},
                 example:
@@ -694,7 +758,7 @@ class App extends GenericApp {
                     cancelText: { type: 'text' },
                     applyText: { type: 'text' },
                     type: { type: 'text' },
-                    input: { type: 'text' },
+                    value: { type: 'text' },
                 },
                 props: {},
             },
