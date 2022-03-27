@@ -678,6 +678,7 @@ class App extends GenericApp {
                     noAdd: { type: 'checkbox' },
                     glowOnChange: { type: 'checkbox' },
                     data: { type: 'custom', default: treeData },
+                    levelShift: { type: 'number', default: 24 },
                 },
                 props: {
                     columns: treeColumns,
