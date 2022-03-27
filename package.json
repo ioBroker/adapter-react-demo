@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.8.1",
     "@emotion/styled": "^11.8.1",
+    "@iobroker/adapter-react-v5": "^2.1.0",
     "@mui/icons-material": "^5.4.2",
     "@mui/material": "^5.4.3",
     "@mui/styles": "^5.4.2",
@@ -22,6 +23,7 @@
     "eslint-plugin-only-warn": "^1.0.3",
     "eslint-plugin-react": "^7.25.1",
     "node-sass": "^6.0.1",
+    "notistack": "^2.0.3",
     "react": "^17.0.2",
     "react-ace": "^9.5.0",
     "react-color": "^2.19.3",

@@ -3,8 +3,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import './index.css';
-// import theme from './adapter-react-v5/src/Theme';
-import Utils from './adapter-react-v5/src/Components/Utils';
+// import theme from '@iobroker/adapter-react-v5/Theme';
+import Utils from '@iobroker/adapter-react-v5/Components/Utils';
+import { SnackbarProvider, withSnackbar } from 'notistack';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import packageJson from '../package.json';
@@ -20,13 +21,15 @@ function build() {
     return ReactDOM.render(
         <StyledEngineProvider injectFirst>
             <ThemeProvider theme={theme(themeName)}>
-                <App
-                    socket={{port: 8082}}
-                    onThemeChange={(_theme) => {
-                        themeName = _theme;
-                        build();
-                    }}
-                />
+                <SnackbarProvider maxSnack={3}>
+                    <App
+                        socket={{port: 8082}}
+                        onThemeChange={(_theme) => {
+                            themeName = _theme;
+                            build();
+                        }}
+                    />
+                </SnackbarProvider>
             </ThemeProvider>
         </StyledEngineProvider>,
         document.getElementById('root'),

@@ -1,7 +1,9 @@
 import React from 'react';
 import './App.scss';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import { MenuItem, Stack, MenuList } from '@mui/material';
+import {
+    MenuItem, Stack, MenuList, Tooltip,
+} from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -12,7 +14,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
@@ -24,36 +25,37 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import withStyles from '@mui/styles/withStyles';
 
 import copy from 'copy-to-clipboard';
-import GenericApp from './adapter-react-v5/src/GenericApp';
+import { withSnackbar } from 'notistack';
+import GenericApp from '@iobroker/adapter-react-v5/GenericApp';
+import I18n from '@iobroker/adapter-react-v5/i18n';
+
+import ColorPicker from '@iobroker/adapter-react-v5/Components/ColorPicker';
+import ComplexCron from '@iobroker/adapter-react-v5/Components/ComplexCron';
+import FileBrowser from '@iobroker/adapter-react-v5/Components/FileBrowser';
+import FileViewer from '@iobroker/adapter-react-v5/Components/FileViewer';
+import Icon from '@iobroker/adapter-react-v5/Components/Icon';
+import IconPicker from '@iobroker/adapter-react-v5/Components/IconPicker';
+import IconSelector from '@iobroker/adapter-react-v5/Components/IconSelector';
+import Image from '@iobroker/adapter-react-v5/Components/Image';
+import Loader from '@iobroker/adapter-react-v5/Components/Loader';
+import Logo from '@iobroker/adapter-react-v5/Components/Logo';
+import ObjectBrowser from '@iobroker/adapter-react-v5/Components/ObjectBrowser';
+import SaveCloseButtons from '@iobroker/adapter-react-v5/Components/SaveCloseButtons';
+import Schedule from '@iobroker/adapter-react-v5/Components/Schedule';
+import SelectWithIcon from '@iobroker/adapter-react-v5/Components/SelectWithIcon';
+import TextWithIcon from '@iobroker/adapter-react-v5/Components/TextWithIcon';
+import ToggleThemeMenu from '@iobroker/adapter-react-v5/Components/ToggleThemeMenu';
+import TreeTable from '@iobroker/adapter-react-v5/Components/TreeTable';
+
+import ComplexCronDialog from '@iobroker/adapter-react-v5/Dialogs/ComplexCron';
+import ConfirmDialog from '@iobroker/adapter-react-v5/Dialogs/Confirm';
+import CronDialog from '@iobroker/adapter-react-v5/Dialogs/Cron';
+import ErrorDialog from '@iobroker/adapter-react-v5/Dialogs/Error';
+import MessageDialog from '@iobroker/adapter-react-v5/Dialogs/Message';
+import SelectIDDialog from '@iobroker/adapter-react-v5/Dialogs/SelectID';
+import SimpleCronDialog from '@iobroker/adapter-react-v5/Dialogs/SimpleCron';
+import TextInputDialog from '@iobroker/adapter-react-v5/Dialogs/TextInput';
 import Connection from './ConnectionSimulate';
-import I18n from './adapter-react-v5/src/i18n';
-
-import ColorPicker from './adapter-react-v5/src/Components/ColorPicker';
-import ComplexCron from './adapter-react-v5/src/Components/ComplexCron';
-import FileBrowser from './adapter-react-v5/src/Components/FileBrowser';
-import FileViewer from './adapter-react-v5/src/Components/FileViewer';
-import Icon from './adapter-react-v5/src/Components/Icon';
-import IconPicker from './adapter-react-v5/src/Components/IconPicker';
-import IconSelector from './adapter-react-v5/src/Components/IconSelector';
-import Image from './adapter-react-v5/src/Components/Image';
-import Loader from './adapter-react-v5/src/Components/Loader';
-import Logo from './adapter-react-v5/src/Components/Logo';
-import ObjectBrowser from './adapter-react-v5/src/Components/ObjectBrowser';
-import SaveCloseButtons from './adapter-react-v5/src/Components/SaveCloseButtons';
-import Schedule from './adapter-react-v5/src/Components/Schedule';
-import SelectWithIcon from './adapter-react-v5/src/Components/SelectWithIcon';
-import TextWithIcon from './adapter-react-v5/src/Components/TextWithIcon';
-import ToggleThemeMenu from './adapter-react-v5/src/Components/ToggleThemeMenu';
-import TreeTable from './adapter-react-v5/src/Components/TreeTable';
-
-import ComplexCronDialog from './adapter-react-v5/src/Dialogs/ComplexCron';
-import ConfirmDialog from './adapter-react-v5/src/Dialogs/Confirm';
-import CronDialog from './adapter-react-v5/src/Dialogs/Cron';
-import ErrorDialog from './adapter-react-v5/src/Dialogs/Error';
-import MessageDialog from './adapter-react-v5/src/Dialogs/Message';
-import SelectIDDialog from './adapter-react-v5/src/Dialogs/SelectID';
-import SimpleCronDialog from './adapter-react-v5/src/Dialogs/SimpleCron';
-import TextInputDialog from './adapter-react-v5/src/Dialogs/TextInput';
 import Example from './Example';
 
 const treeData = [
@@ -236,7 +238,7 @@ class App extends GenericApp {
     cronExpression={this.state.cron}
     onChange={cron => this.setState({cron})}
     language="en"
-/>`
+/>`,
             },
             FileBrowser: {
                 component: FileBrowser,
@@ -313,6 +315,10 @@ class App extends GenericApp {
                     imagePrefix: { type: 'text' },
                 },
                 props: {},
+                example:
+`<Icon
+    src="./adapter/admin/admin.png"
+/>`,
             },
             IconPicker: {
                 component: IconPicker,
@@ -327,6 +333,10 @@ class App extends GenericApp {
                     onlyDevices: { type: 'checkbox' },
                 },
                 props: {},
+                example:
+`<IconPicker
+    onChange={(icon) => this.setState({icon})}
+/>`,
             },
             IconSelector: {
                 component: IconSelector,
@@ -337,6 +347,12 @@ class App extends GenericApp {
                     onlyDevices: { type: 'checkbox' },
                 },
                 props: { t: I18n.t },
+                example:
+`<IconSelector
+    onChange={(icon) => this.setState({icon})}
+    t={I18n.t}
+    lang={I18n.lang}
+/>`,
             },
             Image: {
                 component: Image,
@@ -348,6 +364,10 @@ class App extends GenericApp {
                     className: { type: 'text', default: this.props.classes.image },
                 },
                 props: {},
+                example:
+`<Image
+    src="./adapter/admin/admin.png"
+/>`,
             },
             Loader: {
                 component: Loader,
@@ -358,6 +378,8 @@ class App extends GenericApp {
                 props: {
                     themeType: this.state.themeType,
                 },
+                example:
+'<Loader />',
             },
             Logo: {
                 component: Logo,
@@ -461,6 +483,12 @@ class App extends GenericApp {
                     newReact: { type: 'checkbox' },
                 },
                 props: { theme: this.state.theme },
+                example:
+`<SaveCloseButtons
+    changed={this.state.changed}
+    onSave={() => {}}
+    onClose={() => {}}
+/>`,
             },
             Schedule: {
                 component: Schedule,
@@ -469,6 +497,10 @@ class App extends GenericApp {
                     schedule: { type: 'text' },
                 },
                 props: {},
+                example:
+`<Schedule
+    onChange={(schedule) => this.setState(schedule)}
+/>`,
             },
             SelectWithIcon: {
                 component: SelectWithIcon,
@@ -504,6 +536,30 @@ class App extends GenericApp {
                         },
                     ],
                 },
+                example:
+`<SelectWithIcon
+    onChange={(value) => this.setState({item: value})}
+    t={I18n.t}
+    lang={I18n.lang}
+    list={[
+        {
+            _id: 'system.user.admin',
+            common: {
+                icon: 'image1.png',
+                color: 'red',
+                name: 'Admin',
+            },
+        },
+        {
+            _id: 'system.user.user',
+            common: {
+                icon: 'image2.png',
+                color: 'green',
+                name: 'User',
+            },
+        },
+    ]}
+/>`,
             },
             TextWithIcon: {
                 component: TextWithIcon,
@@ -535,6 +591,30 @@ class App extends GenericApp {
                         },
                     ],
                 },
+                example:
+`<TextWithIcon
+    value={this.state.item}
+    t={I18n.t}
+    lang={I18n.lang}
+    list={[
+        {
+            _id: 'system.user.admin',
+            common: {
+                icon: 'image1.png',
+                color: 'red',
+                name: 'Admin',
+            },
+        },
+        {
+            _id: 'system.user.user',
+            common: {
+                icon: 'image2.png',
+                color: 'green',
+                name: 'User',
+            },
+        },
+    ]}
+/>`,
             },
             ToggleThemeMenu: {
                 component: ToggleThemeMenu,
@@ -624,9 +704,11 @@ class App extends GenericApp {
                     clearButton: { type: 'checkbox' },
                 },
                 props: {},
-                example: `
-                
-`,
+                example:
+`<ComplexCronDialog
+    onOk={(cron) => this.setState({cron})}
+    onClose={() => this.setState({cronDialog: false})}
+/>`,
             },
             ConfirmDialog: {
                 component: ConfirmDialog,
@@ -639,7 +721,7 @@ class App extends GenericApp {
                     cancel: { type: 'text' },
                     suppressQuestionMinutes: { type: 'number' },
                     suppressText: { type: 'text' },
-                    dialogName: { type: 'text', default: 'test'},
+                    dialogName: { type: 'text', default: 'test' },
                 },
                 props: {},
                 example:
@@ -670,6 +752,11 @@ class App extends GenericApp {
                     language: { type: 'text' },
                 },
                 props: {},
+                example:
+`<CronDialog
+    onOk={(cron) => this.setState({cron})}
+    onClose={() => this.setState({cronDialog: false})}
+/>`,
             },
             ErrorDialog: {
                 component: ErrorDialog,
@@ -680,6 +767,12 @@ class App extends GenericApp {
                     text: { type: 'text' },
                 },
                 props: {},
+                example:
+`<ErrorDialog
+    title="Error"
+    text="Error description"
+    onClose={() => this.setState({errorDialog: false})}
+/>`,
             },
             MessageDialog: {
                 component: MessageDialog,
@@ -690,6 +783,13 @@ class App extends GenericApp {
                     text: { type: 'text' },
                 },
                 props: {},
+                example:
+`<MessageDialog
+    title="Title"
+    text="Text"
+    onClose={() => this.setState({errorDialog: false})}
+/>`,
+
             },
             SelectIDDialog: {
                 component: SelectIDDialog,
@@ -746,6 +846,11 @@ class App extends GenericApp {
                     language: { type: 'text' },
                 },
                 props: {},
+                example:
+`<SimpleCronDialog
+    onOk={(cron) => this.setState({cron})}
+    onClose={() => this.setState({cronDialog: false})}
+/>`,
             },
             TextInputDialog: {
                 component: TextInputDialog,
@@ -761,16 +866,18 @@ class App extends GenericApp {
                     value: { type: 'text' },
                 },
                 props: {},
+                example:
+`<TextInputDialog
+    titleText="Title"
+    promptText="Are you sure?"
+    onClose={(result) => this.setState({inputDialog: false, inputValue: result})}
+/>`,
             },
         })
 
     componentDidMount() {
         super.componentDidMount();
         this.setComponent(this.state.component);
-    }
-
-    async onConnectionReady() {
-        //
     }
 
     static getDerivedStateFromError(error) {
@@ -793,13 +900,6 @@ class App extends GenericApp {
                 options.value = comp.value;
             }
             example = comp.example;
-            if (!example) {
-                example = `<${component}\n  ${
-                    Object.keys(comp.props).map(key => `${key}=""`).join('\n  ')
-                }\n  ${
-                    Object.keys(comp.options).map(key => `${key}=""`).join('\n  ')
-                } />`;
-            }
         }
 
         this.setState({
@@ -819,7 +919,15 @@ class App extends GenericApp {
                 <Example code={this.state.example} themeName={this.state.themeName} />
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => copy(this.state.example)} variant="outlined">{I18n.t('Copy to clipboard')}</Button>
+                <Button
+                    onClick={() => {
+                        copy(this.state.example);
+                        this.props.enqueueSnackbar(I18n.t('Copied'));
+                    }}
+                    variant="outlined"
+                >
+                    {I18n.t('Copy to clipboard')}
+                </Button>
                 <Button onClick={() => this.setState({ openDialog: false })} autoFocus variant="contained">{I18n.t('Close')}</Button>
             </DialogActions>
         </Dialog>;
@@ -903,9 +1011,13 @@ class App extends GenericApp {
             </div>
             <div className={this.props.classes.optionsDiv}>
                 <div className={this.props.classes.optionsTitle}>{I18n.t('Options')}</div>
-                {this.state.example ? <Fab color="primary" className={this.props.classes.optionsGithub} size="small" onClick={() => this.setState({ openDialog: true })}>
-                    <GitHubIcon />
-                </Fab> : null }
+                {this.state.example
+                    ? <Tooltip title={I18n.t('Show example')}>
+                        <Fab color="primary" className={this.props.classes.optionsGithub} size="small" onClick={() => this.setState({ openDialog: true })}>
+                            <GitHubIcon />
+                        </Fab>
+                    </Tooltip>
+                    : null }
                 {options}
             </div>
         </div>;
@@ -945,7 +1057,7 @@ class App extends GenericApp {
                                 {Object.keys(this.getComponents()).map(name => <MenuItem
                                     key={name}
                                     selected={name === this.state.component}
-                                    onClick={e => this.setComponent(name)}
+                                    onClick={() => this.setComponent(name)}
                                 >
                                     {name}
                                 </MenuItem>)}
@@ -974,4 +1086,4 @@ class App extends GenericApp {
     }
 }
 
-export default withStyles(styles)(App);
+export default withStyles(styles)(withSnackbar(App));
