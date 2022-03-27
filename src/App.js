@@ -1,9 +1,8 @@
 import React from 'react';
-import './App.scss';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import {
-    MenuItem, Stack, MenuList, Tooltip,
-} from '@mui/material';
+import { MenuItem, Stack, MenuList } from '@mui/material';
+import Splitter, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
+
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -19,6 +18,7 @@ import Button from '@mui/material/Button';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import Tooltip from '@mui/material/Tooltip';
 
 import GitHubIcon from '@mui/icons-material/GitHub';
 
@@ -56,18 +56,45 @@ import SelectIDDialog from '@iobroker/adapter-react-v5/Dialogs/SelectID';
 import SimpleCronDialog from '@iobroker/adapter-react-v5/Dialogs/SimpleCron';
 import TextInputDialog from '@iobroker/adapter-react-v5/Dialogs/TextInput';
 import Connection from './ConnectionSimulate';
-import Example from './Example';
+import Example from './Components/Example';
 
 const treeData = [
     {
         id: 'UniqueID1', // required
         fieldIdInData: 'Name1',
         myType: 'number',
+        myOptions: {
+            mySubNumber: 'one',
+            myText: 'Text1',
+        },
     },
     {
         id: 'UniqueID2', // required
+        fieldIdInData: 'Name2',
+        myType: 'string',
+        myOptions: {
+            mySubNumber: 'two',
+            myText: 'Text2',
+        },
+    },
+    {
+        id: 'UniqueID3', // required
         fieldIdInData: 'Name12',
         myType: 'string',
+        parentId: 'UniqueID2',
+        myOptions: {
+            mySubNumber: 'three',
+            myText: 'Text3',
+        },
+    },
+    {
+        id: 'UniqueID4', // required
+        fieldIdInData: 'Name3',
+        myType: 'string',
+        myOptions: {
+            mySubNumber: '',
+            myText: 'Text4',
+        },
     },
 ];
 
@@ -75,7 +102,7 @@ const treeColumns = [
     {
         title: 'Name of field', // required, else it will be "field"
         field: 'fieldIdInData', // required
-        editable: false, // or true [default - true]
+        // First column cannot be editable
         cellStyle: { // CSS style - // optional
             maxWidth: '12rem',
             overflow: 'hidden',
@@ -85,6 +112,15 @@ const treeColumns = [
             value1: 'text1',
             value2: 'text2',
         },
+
+        // Important: subField could be only be the first column
+        subField: 'myOptions.mySubNumber',
+        subLookup: { // optional => edit will be automatically "SELECT"
+            one: 'One',
+            two: 'Two',
+            three: 'Three',
+        },
+        subStyle: { color: '#00FF00' },
     },
     {
         title: 'Type', // required, else it will be "field"
@@ -95,7 +131,13 @@ const treeColumns = [
             string: 'String',
             boolean: 'Boolean',
         },
-        type: 'number/string/color/oid/icon/boolean', // oid=ObjectID,icon=base64-icon
+        type: 'string', // oid=ObjectID,icon=base64-icon
+    },
+    {
+        title: 'Text', // required, else it will be "field"
+        field: 'myOptions.myText', // required
+        editable: true, // or true [default - true]
+        type: 'string', // number/string/color/oid/icon/boolean
         editComponent: props => <div>
             Prefix&#123;
             {' '}
@@ -107,7 +149,7 @@ const treeColumns = [
                 onChange={e => props.onChange(e.target.value)}
             />
             Suffix
-        </div>,
+        </div>
     },
 ];
 
@@ -120,12 +162,15 @@ const styles = theme => ({
     component: {
         width: '100%',
         overflowY: 'auto',
+        height: '100%',
     },
     stack: {
         height: 'calc(100% - 52px)',
     },
     menu: {
-        overflowY: 'auto', height: '100%', width: 320,
+        overflowY: 'auto',
+        height: '100%',
+        width: '100%',
     },
     header: {
         paddingTop: 10,
@@ -136,7 +181,7 @@ const styles = theme => ({
         height: 'calc(100% - 72px)',
     },
     componentDiv: {
-        height: 'calc(100% - 200px)',
+        height: '100%',
         overflowY: 'auto',
     },
     optionsDiv: {
@@ -192,15 +237,6 @@ class App extends GenericApp {
 
         // icon cache
         this.icons = {};
-
-        this.state = {
-            ...this.state,
-            component: window.localStorage.getItem('component') ? window.localStorage.getItem('component') : 'ObjectBrowser',
-            error: false,
-            options: {},
-            openDialog: false,
-            example: '',
-        };
     }
 
     getComponents = () => (
@@ -327,6 +363,7 @@ class App extends GenericApp {
                 options: {
                     previewClassName: { type: 'text' },
                     label: { type: 'text' },
+                    value: { type: 'text' },
                     disabled: { type: 'checkbox' },
 
                     onlyRooms: { type: 'checkbox' },
@@ -335,13 +372,14 @@ class App extends GenericApp {
                 props: {},
                 example:
 `<IconPicker
-    onChange={(icon) => this.setState({icon})}
+    onChange={icon => this.setState({icon})}
+    value={this.state.icon}
 />`,
             },
             IconSelector: {
                 component: IconSelector,
                 custom: true,
-                onChange: true,
+                onSelect: true,
                 options: {
                     onlyRooms: { type: 'checkbox' },
                     onlyDevices: { type: 'checkbox' },
@@ -349,9 +387,9 @@ class App extends GenericApp {
                 props: { t: I18n.t },
                 example:
 `<IconSelector
-    onChange={(icon) => this.setState({icon})}
+    onSelect={icon => this.setState({icon})}
     t={I18n.t}
-    lang={I18n.lang}
+    lang={I18n.getLanguage()}
 />`,
             },
             Image: {
@@ -431,7 +469,7 @@ class App extends GenericApp {
                     objectEditOfAccessControl: { type: 'checkbox' },
                 },
                 props: {
-                    lang: I18n.lang,
+                    lang: I18n.getLanguage(),
                     t: I18n.t,
                     socket: this.socket,
                     columns: ['role', 'func', 'val', 'name'],
@@ -540,7 +578,7 @@ class App extends GenericApp {
 `<SelectWithIcon
     onChange={(value) => this.setState({item: value})}
     t={I18n.t}
-    lang={I18n.lang}
+    lang={I18n.getLanguage()}
     list={[
         {
             _id: 'system.user.admin',
@@ -595,7 +633,7 @@ class App extends GenericApp {
 `<TextWithIcon
     value={this.state.item}
     t={I18n.t}
-    lang={I18n.lang}
+    lang={I18n.getLanguage()}
     list={[
         {
             _id: 'system.user.admin',
@@ -629,18 +667,20 @@ class App extends GenericApp {
             TreeTable: {
                 component: TreeTable,
                 custom: true,
+                onUpdate: true,
+                dataAlwaysChange: true,
                 options: {
                     className: { type: 'text' },
                     name: { type: 'text' },
                     themeType: { type: 'text' },
-                    loading: { type: 'checkbox' },
+                    loading: { type: 'checkbox', default: false },
                     noSort: { type: 'checkbox' },
                     noAdd: { type: 'checkbox' },
                     glowOnChange: { type: 'checkbox' },
+                    data: { type: 'custom', default: treeData },
                 },
                 props: {
                     columns: treeColumns,
-                    data: treeData,
                 },
                 example:
 `<TreeTable
@@ -814,7 +854,7 @@ class App extends GenericApp {
                     multiSelect: { type: 'checkbox' },
                 },
                 props: {
-                    lang: I18n.lang,
+                    lang: I18n.getLanguage(),
                     t: I18n.t,
                     socket: this.socket,
                 },
@@ -877,7 +917,20 @@ class App extends GenericApp {
 
     componentDidMount() {
         super.componentDidMount();
-        this.setComponent(this.state.component);
+
+        this.setState({
+            component: window.localStorage.getItem('component') || 'ObjectBrowser',
+            error: false,
+            options: {},
+            openDialog: false,
+            example: '',
+            splitSizes: window.localStorage.getItem('splitSizes')
+                ? JSON.parse(window.localStorage.getItem('splitSizes'))
+                : [15, 85],
+            splitSizes2: window.localStorage.getItem('splitSizes2')
+                ? JSON.parse(window.localStorage.getItem('splitSizes2'))
+                : [80, 20],
+        }, () => this.setComponent(this.state.component));
     }
 
     static getDerivedStateFromError(error) {
@@ -903,8 +956,12 @@ class App extends GenericApp {
         }
 
         this.setState({
-            component, error: false, options, example,
+            component,
+            error: false,
+            options,
+            example,
         });
+
         window.localStorage.setItem('component', component);
     }
 
@@ -987,12 +1044,46 @@ class App extends GenericApp {
                 })(comp.options[option], option));
 
             const props = { ...comp.props, ...this.state.options };
-            if (comp.onChange) {
-                props.onChange = value => {
+            if (comp.onChange || comp.onSelect) {
+                const onChange = value => {
                     const _options = JSON.parse(JSON.stringify(this.state.options));
                     _options.value = value;
                     this.setState({ options: _options });
                 };
+                if (comp.onChange) {
+                    props.onChange = onChange;
+                } else {
+                    props.onSelect = onChange;
+                }
+            }
+
+            // special solution for TreeTable
+            if (comp.onUpdate) {
+                props.onUpdate = (newData, oldData) => {
+                    const options = JSON.parse(JSON.stringify(this.state.options));
+                    // add new
+                    if (newData === true) {
+                        options.data.push({
+                            id: 'id_' + Math.random() * 100000, // required
+                            fieldIdInData: 'Name' + options.data.length,
+                            myType: '',
+                            myOptions: {
+                                mySubNumber: '',
+                                myText: 'Text' + options.data.length,
+                            },
+                        });
+                    } else {
+                        const index = options.data.findIndex(item => item.id === newData.id);
+                        options.data[index] = newData;
+                    }
+                    this.setState({ options });
+                };
+                props.onDelete = oldData => {
+                    const options = JSON.parse(JSON.stringify(this.state.options));
+                    const index = options.data.findIndex(item => item.id === oldData.id);
+                    options.data.splice(index, 1);
+                    this.setState({ options });
+                }
             }
 
             if (comp.dialog) {
@@ -1006,20 +1097,32 @@ class App extends GenericApp {
         }
 
         return <div className={this.props.classes.componentOptionsDiv}>
-            <div className={this.props.classes.componentDiv}>
-                {comp}
-            </div>
-            <div className={this.props.classes.optionsDiv}>
-                <div className={this.props.classes.optionsTitle}>{I18n.t('Options')}</div>
-                {this.state.example
-                    ? <Tooltip title={I18n.t('Show example')}>
-                        <Fab color="primary" className={this.props.classes.optionsGithub} size="small" onClick={() => this.setState({ openDialog: true })}>
-                            <GitHubIcon />
-                        </Fab>
-                    </Tooltip>
-                    : null }
-                {options}
-            </div>
+            <Splitter
+                direction={SplitDirection.Vertical}
+                initialSizes={this.state.splitSizes2}
+                minHeights={[0, 100]}
+                onResizeFinished={(gutterIdx, newSizes) => {
+                    this.setState({ splitSizes2: newSizes });
+                    window.localStorage.setItem('splitSizes2', JSON.stringify(newSizes));
+                }}
+                theme={this.state.themeName === 'dark' ? GutterTheme.Dark : GutterTheme.Light}
+                gutterClassName={this.state.themeName === 'dark' ? 'Dark visGutter' : 'Light visGutter'}
+            >
+                <div className={this.props.classes.componentDiv}>
+                    {comp}
+                </div>
+                <div className={this.props.classes.optionsDiv}>
+                    <div className={this.props.classes.optionsTitle}>{I18n.t('Options')}</div>
+                    {this.state.example
+                        ? <Tooltip title={I18n.t('Show example')}>
+                            <Fab color="primary" className={this.props.classes.optionsGithub} size="small" onClick={() => this.setState({ openDialog: true })}>
+                                <GitHubIcon />
+                            </Fab>
+                        </Tooltip>
+                        : null }
+                    {options}
+                </div>
+            </Splitter>
         </div>;
     }
 
@@ -1052,33 +1155,45 @@ class App extends GenericApp {
                     </AppBar>
 
                     <Stack direction="row" spacing={2} className={this.props.classes.stack}>
-                        <div className={this.props.classes.menu}>
-                            <MenuList>
-                                {Object.keys(this.getComponents()).map(name => <MenuItem
-                                    key={name}
-                                    selected={name === this.state.component}
-                                    onClick={() => this.setComponent(name)}
-                                >
-                                    {name}
-                                </MenuItem>)}
-                            </MenuList>
-                        </div>
-                        <div className={this.props.classes.component}>
-                            <h2>
-                                {this.getComponents()[this.state.component]
-                                    ? this.state.component
-                                    : I18n.t('Select component')}
-                            </h2>
-                            {this.state.error
-                                ? <>
-                                    <div>
-                                        {I18n.t('Error component: ')}
-                                        {this.state.component}
-                                    </div>
-                                    <pre>{this.state.errorText.stack.toString()}</pre>
-                                </>
-                                : this.renderComponentAndOptions(this.getComponents()[this.state.component])}
-                        </div>
+                        <Splitter
+                            direction={SplitDirection.Horizontal}
+                            initialSizes={this.state.splitSizes}
+                            minWidths={[170, 0]} // In pixels.
+                            onResizeFinished={(gutterIdx, newSizes) => {
+                                this.setState({ splitSizes: newSizes });
+                                window.localStorage.setItem('splitSizes', JSON.stringify(newSizes));
+                            }}
+                            theme={this.state.themeName === 'dark' ? GutterTheme.Dark : GutterTheme.Light}
+                            gutterClassName={this.state.themeName === 'dark' ? 'Dark visGutter' : 'Light visGutter'}
+                        >
+                            <div className={this.props.classes.menu}>
+                                <MenuList>
+                                    {Object.keys(this.getComponents()).map(name => <MenuItem
+                                        key={name}
+                                        selected={name === this.state.component}
+                                        onClick={() => this.setComponent(name)}
+                                    >
+                                        {name}
+                                    </MenuItem>)}
+                                </MenuList>
+                            </div>
+                            <div className={this.props.classes.component}>
+                                <h2>
+                                    {this.getComponents()[this.state.component]
+                                        ? this.state.component
+                                        : I18n.t('Select component')}
+                                </h2>
+                                {this.state.error
+                                    ? <>
+                                        <div>
+                                            {I18n.t('Error component: ')}
+                                            {this.state.component}
+                                        </div>
+                                        <pre>{this.state.errorText.stack.toString()}</pre>
+                                    </>
+                                    : this.renderComponentAndOptions(this.getComponents()[this.state.component])}
+                            </div>
+                        </Splitter>
                     </Stack>
                 </div>
             </ThemeProvider>

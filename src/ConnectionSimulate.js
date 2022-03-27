@@ -7,9 +7,9 @@
  *
  * */
 import PropTypes from 'prop-types';
-import SimulatedObjects from './objects.json';
-import SimulatedStates from './states.json';
-import SimulatedFiles from './files.json';
+import SimulatedObjects from './data/objects.json';
+import SimulatedStates from './data/states.json';
+import SimulatedFiles from './data/files.json';
 
 /** Possible progress states. */
 export const PROGRESS = {

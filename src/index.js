@@ -2,16 +2,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import './index.css';
-// import theme from '@iobroker/adapter-react-v5/Theme';
 import Utils from '@iobroker/adapter-react-v5/Components/Utils';
-import { SnackbarProvider, withSnackbar } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import packageJson from '../package.json';
 import theme from './theme';
+import './index.css';
 
-window.adapterName = 'vis';
+window.adapterName = 'adapter-react-demo';
 let themeName = Utils.getThemeName();
 
 console.log(`iobroker.${window.adapterName}@${packageJson.version} using theme "${themeName}"`);

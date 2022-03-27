@@ -57,5 +57,12 @@
   "ON": "ON",
   "OFF": "OFF",
   "15 m.": "15 m.",
-  "30 m.": "30 m."
+  "30 m.": "30 m.",
+  "Copy to clipboard": "Kopieer naar klembord",
+  "Close": "Dichtbij",
+  "Options": "Opties",
+  "Show example": "Voorbeeld tonen",
+  "Change color theme": "Kleurthema wijzigen",
+  "Usage example": "Gebruiksvoorbeeld",
+  "Adapter react": "Adapter React"
 }

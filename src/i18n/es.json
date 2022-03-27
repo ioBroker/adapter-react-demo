@@ -57,5 +57,12 @@
   "ON": "SOBRE",
   "OFF": "OFF",
   "15 m.": "15 m.",
-  "30 m.": "30 m."
+  "30 m.": "30 m.",
+  "Copy to clipboard": "Copiar al portapapeles",
+  "Close": "Cerrar",
+  "Options": "Opciones",
+  "Show example": "Mostrar ejemplo",
+  "Change color theme": "Cambiar tema de color",
+  "Usage example": "ejemplo de uso",
+  "Adapter react": "Adapter React"
 }

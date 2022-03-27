@@ -57,5 +57,12 @@
   "ON": "在",
   "OFF": "离开",
   "15 m.": "15分钟",
-  "30 m.": "30分钟"
+  "30 m.": "30分钟",
+  "Copy to clipboard": "复制到剪贴板",
+  "Close": "关闭",
+  "Options": "选项",
+  "Show example": "显示示例",
+  "Change color theme": "更改颜色主题",
+  "Usage example": "使用示例",
+  "Adapter react": "Adapter React"
 }
