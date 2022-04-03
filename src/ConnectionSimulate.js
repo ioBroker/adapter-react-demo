@@ -262,12 +262,11 @@ class ConnectionSimulate {
                     } else {
                         this.systemLang = window.navigator.userLanguage || window.navigator.language;
 
-                        if (this.systemLang !== 'en' && this.systemLang !== 'de' && this.systemLang !== 'ru') {
+                        if (this.systemLang !== 'en' && this.systemLang !== 'de' && this.systemLang !== 'ru' && this.systemLang !== 'nl') {
                             this.systemConfig.common.language = 'en';
                             this.systemLang = 'en';
                         }
                     }
-                    this.systemLang = 'en';
 
                     this.props.onLanguage && this.props.onLanguage(this.systemLang);
 

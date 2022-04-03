@@ -15,10 +15,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import Tooltip from '@mui/material/Tooltip';
 
 import GitHubIcon from '@mui/icons-material/GitHub';
 
@@ -26,6 +26,7 @@ import withStyles from '@mui/styles/withStyles';
 
 import copy from 'copy-to-clipboard';
 import { withSnackbar } from 'notistack';
+
 import GenericApp from '@iobroker/adapter-react-v5/GenericApp';
 import I18n from '@iobroker/adapter-react-v5/i18n';
 
@@ -46,7 +47,6 @@ import SelectWithIcon from '@iobroker/adapter-react-v5/Components/SelectWithIcon
 import TextWithIcon from '@iobroker/adapter-react-v5/Components/TextWithIcon';
 import ToggleThemeMenu from '@iobroker/adapter-react-v5/Components/ToggleThemeMenu';
 import TreeTable from '@iobroker/adapter-react-v5/Components/TreeTable';
-
 import ComplexCronDialog from '@iobroker/adapter-react-v5/Dialogs/ComplexCron';
 import ConfirmDialog from '@iobroker/adapter-react-v5/Dialogs/Confirm';
 import CronDialog from '@iobroker/adapter-react-v5/Dialogs/Cron';
@@ -55,6 +55,7 @@ import MessageDialog from '@iobroker/adapter-react-v5/Dialogs/Message';
 import SelectIDDialog from '@iobroker/adapter-react-v5/Dialogs/SelectID';
 import SimpleCronDialog from '@iobroker/adapter-react-v5/Dialogs/SimpleCron';
 import TextInputDialog from '@iobroker/adapter-react-v5/Dialogs/TextInput';
+
 import Connection from './ConnectionSimulate';
 import Example from './Components/Example';
 
@@ -186,7 +187,7 @@ const styles = theme => ({
     },
     optionsDiv: {
         borderTop: '1px solid grey',
-        height: 200,
+        height: '100%',
         position: 'relative',
         overflowY: 'auto',
     },
@@ -214,6 +215,19 @@ const styles = theme => ({
     },
 });
 
+const LANGUAGES = {
+    en: 'english',
+    de: 'deutsch',
+    ru: 'русский',
+    pt: 'pt',
+    nl: 'nl',
+    fr: 'fr',
+    it: 'it',
+    es: 'es',
+    pl: 'pl',
+    'zh-cn': 'zh-cn',
+};
+
 class App extends GenericApp {
     constructor(props) {
         const extendedProps = { ...props };
@@ -237,6 +251,22 @@ class App extends GenericApp {
 
         // icon cache
         this.icons = {};
+
+        let language = window.localStorage.getItem('language');
+        if (!language && LANGUAGES[(window.navigator.language || navigator.userLanguage).substring(0, 2)]) {
+            language = (window.navigator.language || navigator.userLanguage).substring(0, 2);
+        }
+        if (!language && LANGUAGES[(window.navigator.language || navigator.userLanguage).substring(0, 4).toLowerCase()]) {
+            language = (window.navigator.language || navigator.userLanguage).substring(0, 4).toLowerCase();
+        }
+
+        I18n.setLanguage(language);
+        this.socket.simulateObjects['system.config'].common.language = language;
+
+        this.state = {
+            ...this.state,
+            language,
+        };
     }
 
     getComponents = () => (
@@ -267,7 +297,7 @@ class App extends GenericApp {
                 custom: true,
                 options: {
                     cronExpression: { type: 'text' },
-                    language: { type: 'text' },
+                    language: { type: 'language' },
                 },
                 props: {},
                 example: `<ComplexCron
@@ -295,6 +325,7 @@ class App extends GenericApp {
                     viewType: { type: 'checkbox' },
                     showViewTypeButton: { type: 'checkbox' },
                     tileView: { type: 'checkbox' },
+                    lang: {type: 'language' },
                 },
                 props: {
                     socket: this.socket,
@@ -316,15 +347,7 @@ class App extends GenericApp {
                 custom: true,
                 options: {
                     fullScreen: { type: 'checkbox', default: false },
-                    lang: {
-                        type: 'options',
-                        default: 'en',
-                        options: [
-                            { value: 'ru', title: 'ru' },
-                            { value: 'de', title: 'de' },
-                            { value: 'en', title: 'en' },
-                        ],
-                    },
+                    lang: {type: 'language'},
                     href: {
                         type: 'options',
                         default: './adapter/admin/admin.png',
@@ -383,6 +406,7 @@ class App extends GenericApp {
                 options: {
                     onlyRooms: { type: 'checkbox' },
                     onlyDevices: { type: 'checkbox' },
+                    lang: {type: 'language' },
                 },
                 props: { t: I18n.t },
                 example:
@@ -433,6 +457,8 @@ class App extends GenericApp {
                         readme: 'https://www.iobroker.net/#de/adapters/adapterref/iobroker.cloud/README.md',
                     },
                     instance: 1,
+                    onError: error => console.error(error),
+                    onLoad: () => {}
                 },
                 example:
 `<Logo
@@ -467,6 +493,7 @@ class App extends GenericApp {
                     objectStatesView: { type: 'checkbox' },
                     objectImportExport: { type: 'checkbox' },
                     objectEditOfAccessControl: { type: 'checkbox' },
+                    lang: {type: 'language' },
                 },
                 props: {
                     lang: I18n.getLanguage(),
@@ -552,6 +579,7 @@ class App extends GenericApp {
                     disabled: { type: 'checkbox' },
                     fullWidth: { type: 'checkbox' },
                     allowNone: { type: 'checkbox' },
+                    lang: {type: 'language' },
                 },
                 onChange: true,
                 props: {
@@ -608,6 +636,7 @@ class App extends GenericApp {
                     className: { type: 'text', default: this.props.classes.textWithIcon },
                     title: { type: 'text' },
                     removePrefix: { type: 'text' },
+                    lang: {type: 'language' },
                 },
                 props: {
                     list: [
@@ -741,7 +770,7 @@ class App extends GenericApp {
                     cancel: { type: 'text' },
                     ok: { type: 'text' },
                     simple: { type: 'checkbox' },
-                    language: { type: 'text' },
+                    language: { type: 'language' },
                     clearButton: { type: 'checkbox' },
                 },
                 props: {},
@@ -790,7 +819,7 @@ class App extends GenericApp {
                     ok: { type: 'text' },
                     simple: { type: 'checkbox' },
                     complex: { type: 'checkbox' },
-                    language: { type: 'text' },
+                    language: { type: 'language' },
                 },
                 props: {},
                 example:
@@ -839,7 +868,7 @@ class App extends GenericApp {
                 options: {
                     dialogName: { type: 'text' },
                     title: { type: 'text' },
-                    lang: { type: 'text' },
+                    lang: { type: 'language' },
                     selected: { type: 'text' },
                     cancel: { type: 'text' },
                     imagePrefix: { type: 'text' },
@@ -884,7 +913,7 @@ class App extends GenericApp {
                     cancel: { type: 'text' },
                     ok: { type: 'text' },
                     simple: { type: 'checkbox' },
-                    language: { type: 'text' },
+                    language: { type: 'language' },
                 },
                 props: {},
                 example:
@@ -947,6 +976,8 @@ class App extends GenericApp {
             Object.keys(comp.options).forEach(option => {
                 if (comp.options[option].default) {
                     options[option] = comp.options[option].default;
+                } else if (comp.options[option].type === 'language') {
+                    options[option] = I18n.getLanguage();
                 }
             });
 
@@ -1000,6 +1031,23 @@ class App extends GenericApp {
             options = Object.keys(comp.options).map(option => (
                 (item, _option) => {
                     let input = null;
+                    if (item.type === 'language') {
+                        input = null;/*<FormControl>
+                            <InputLabel>{I18n.t('Language')}</InputLabel>
+                            <Select
+                                variant="standard"
+                                value={this.state.options[option]}
+                                label="Language"
+                                onChange={e => {
+                                    const _options = JSON.parse(JSON.stringify(this.state.options));
+                                    _options[_option] = e.target.value;
+                                    this.setState({ options: _options });
+                                }}
+                            >
+                                { Object.keys(LANGUAGES).map(lang => <MenuItem key={lang} value={lang}>{LANGUAGES[lang]}</MenuItem>) }
+                            </Select>
+                        </FormControl>;*/
+                    } else
                     if (item.type === 'checkbox') {
                         input = <FormControlLabel
                             control={<Checkbox
@@ -1127,6 +1175,24 @@ class App extends GenericApp {
         </div>;
     }
 
+    renderLanguageSelector() {
+        return <Select
+            variant="standard"
+            value={this.state.language}
+            label={I18n.t('Language')}
+            onChange={e => {
+                if (e.target.value !== this.state.language) {
+                    I18n.setLanguage(e.target.value);
+                    this.setState({ language: e.target.value });
+                    window.localStorage.setItem('language', e.target.value);
+                    window.location.reload();
+                }
+            }}
+        >
+            { Object.keys(LANGUAGES).map(lang => <MenuItem key={lang} value={lang}>{LANGUAGES[lang]}</MenuItem>) }
+        </Select>;
+    }
+
     render() {
         if (!this.state.loaded) {
             return <StyledEngineProvider injectFirst>
@@ -1147,6 +1213,7 @@ class App extends GenericApp {
                                     I18n.t('Adapter react')
                                 }
                             </Typography>
+                            { this.renderLanguageSelector() }
                             <ToggleThemeMenu
                                 toggleTheme={() => this.toggleTheme()}
                                 themeName={this.state.themeName}
