@@ -2079,20 +2079,12 @@ class ConnectionSimulate {
     }
 
     // returns very optimized information for adapters to minimize connection load
-    getCompactSystemConfig(update) {
-        if (!update && this._promises.systemConfigCommon) {
-            return this._promises.systemConfigCommon;
-        }
-
+    getCompactSystemConfig() {
         if (!this.connected) {
             return Promise.reject(NOT_CONNECTED);
         }
 
-        this._promises.systemConfigCommon = new Promise((resolve, reject) =>
-            this._socket.emit('getCompactSystemConfig', (err, systemConfig) =>
-                err ? reject(err) : resolve(systemConfig)));
-
-        return this._promises.systemConfigCommon;
+        return Promise.resolve(this.simulateObjects['system.config']);
     }
 
     /**

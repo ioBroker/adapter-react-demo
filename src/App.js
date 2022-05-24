@@ -47,6 +47,8 @@ import SelectWithIcon from '@iobroker/adapter-react-v5/Components/SelectWithIcon
 import TextWithIcon from '@iobroker/adapter-react-v5/Components/TextWithIcon';
 import ToggleThemeMenu from '@iobroker/adapter-react-v5/Components/ToggleThemeMenu';
 import TreeTable from '@iobroker/adapter-react-v5/Components/TreeTable';
+import JsonConfig from './Components/JsonConfig';
+
 import ComplexCronDialog from '@iobroker/adapter-react-v5/Dialogs/ComplexCron';
 import ConfirmDialog from '@iobroker/adapter-react-v5/Dialogs/Confirm';
 import CronDialog from '@iobroker/adapter-react-v5/Dialogs/Cron';
@@ -943,6 +945,8 @@ class App extends GenericApp {
     onClose={(result) => this.setState({inputDialog: false, inputValue: result})}
 />`,
             },
+            JsonConfig: {
+            }
         })
 
     componentDidMount() {
@@ -1023,6 +1027,15 @@ class App extends GenericApp {
     }
 
     renderComponentAndOptions(comp) {
+        if (this.state.component === 'JsonConfig') {
+            return <JsonConfig
+                themeName={this.state.themeName}
+                themeType={this.state.themeType}
+                theme={this.state.theme}
+                socket={this.socket}
+            />;
+        }
+
         let options = null;
 
         if (comp.custom) {
@@ -1209,9 +1222,7 @@ class App extends GenericApp {
                     <AppBar position="static">
                         <Toolbar variant="dense">
                             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                                {
-                                    I18n.t('Adapter react')
-                                }
+                                { I18n.t('Adapter react')}
                             </Typography>
                             { this.renderLanguageSelector() }
                             <ToggleThemeMenu
