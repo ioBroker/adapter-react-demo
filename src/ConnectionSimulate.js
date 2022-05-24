@@ -1501,20 +1501,7 @@ class ConnectionSimulate {
      * @returns {Promise<any>}
      */
     checkFeatureSupported(feature, update) {
-        if (!update && this._promises['supportedFeatures_' + feature]) {
-            return this._promises['supportedFeatures_' + feature];
-        }
-
-        if (!this.connected) {
-            return Promise.reject(NOT_CONNECTED);
-        }
-
-        this._promises['supportedFeatures_' + feature] = new Promise((resolve, reject) =>
-            this._socket.emit('checkFeatureSupported', feature, (err, features) => {
-                err ? reject(err) : resolve(features)
-            }));
-
-        return this._promises['supportedFeatures_' + feature];
+        return Promise.resolve(true);
     }
 
     /**
@@ -2174,6 +2161,14 @@ class ConnectionSimulate {
      */
     logout() {
         return Promise.resolve(null);
+    }
+
+    subscribeFiles() {
+        return Promise.resolve();
+    }
+
+    unsubscribeFiles() {
+        return Promise.resolve();
     }
 }
 
