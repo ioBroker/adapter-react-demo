@@ -88,6 +88,7 @@ class JsonConfig extends React.Component {
 
         this.state = {
             schema: null,
+            schemaText: '',
             data: null,
             updateData: 0,
             common: null,
@@ -103,7 +104,12 @@ class JsonConfig extends React.Component {
                     JsonConfigComponent.loadI18n(this.props.socket, schema?.i18n, this.props.adapterName)
                         .then(() => {
                             if (obj) {
-                                this.setState({schema, data: obj.native, common: obj.common}, () => this.onApply());
+                                this.setState({
+                                    schema,
+                                    schemaText: JSON.stringify(schema, null, 2),
+                                    data: obj.native,
+                                    common: obj.common
+                                }, () => this.onApply());
                             } else {
                                 window.alert(`Instance system.adapter.${this.props.adapterName}.${this.props.instance} not found!`);
                             }
@@ -111,8 +117,20 @@ class JsonConfig extends React.Component {
     }
 
     getSchema() {
-        return fetch('./jsonConfig.json')
-            .then(data => data.json());
+        if (!this.state.schemaText) {
+            return fetch('./jsonConfig.json')
+                .then(data => data.json());
+        } else {
+            let schema;
+            try {
+                schema = JSON.parse(this.state.schemaText);
+            } catch (e) {
+                return Promise.resolve(this.state.schema);
+            }
+            return new Promise(resolve =>
+                this.setState({ schema }, () =>
+                    resolve(this.state.schema)));
+        }
     }
 
     getDataForEdit() {
@@ -204,7 +222,7 @@ class JsonConfig extends React.Component {
 
         return <Splitter
             direction={SplitDirection.Horizontal}
-            initialSizes={[70, 30]}
+            initialSizes={[60, 30, 20]}
             minHeights={[0, 100]}
             /*onResizeFinished={(gutterIdx, newSizes) => {
                 this.setState({ splitSizes2: newSizes });
@@ -237,6 +255,35 @@ class JsonConfig extends React.Component {
                 />
             </div>
             <div style={{width: '100%', height: '100%', overflow: 'hidden'}}>
+                <AceEditor
+                    mode="json"
+                    fontSize={14}
+                    theme={this.props.themeName === 'dark' ? 'clouds_midnight' : 'chrome'}
+                    width="100%"
+                    height="100%"
+                    value={this.state.schemaText}
+                    onChange={value => {
+                        let schema
+                        try {
+                            schema = JSON.parse(value);
+                        } catch (e) {
+
+                        }
+                        const newState = { schemaText: value };
+                        if (schema) {
+                            newState.schema = schema;
+                            newState.updateData = this.state.updateData + 1;
+                        }
+                        this.setState(newState);
+                    }}
+                    setOptions={{
+                        enableBasicAutocompletion: true,
+                        enableLiveAutocompletion: true,
+                        enableSnippets: true,
+                    }}
+                />
+            </div>
+             <div style={{width: '100%', height: '100%', overflow: 'hidden'}}>
                 <AceEditor
                     mode="json"
                     fontSize={14}
