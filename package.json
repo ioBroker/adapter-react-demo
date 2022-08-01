@@ -7,7 +7,7 @@
     "@iobroker/adapter-react-v5": "^3.1.16",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.8.6",
-    "@mui/styles": "^5.8.6",
+    "@mui/styles": "^5.9.2",
     "@mui/x-date-pickers": "^5.0.0-alpha.7",
     "ace-builds": "^1.7.1",
     "copy-to-clipboard": "^3.3.1",
