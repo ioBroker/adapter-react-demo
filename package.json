@@ -9,7 +9,7 @@
     "@mui/material": "^5.11.15",
     "@mui/styles": "^5.11.11",
     "@mui/x-date-pickers": "^6.0.3",
-    "ace-builds": "^1.16.0",
+    "ace-builds": "^1.18.0",
     "copy-to-clipboard": "^3.3.3",
     "notistack": "^2.0.8",
     "react": "^18.1.0",
