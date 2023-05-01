@@ -8,7 +8,7 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.15",
     "@mui/styles": "^5.11.11",
-    "@mui/x-date-pickers": "^6.0.3",
+    "@mui/x-date-pickers": "^6.3.0",
     "ace-builds": "^1.16.0",
     "copy-to-clipboard": "^3.3.3",
     "notistack": "^2.0.8",
