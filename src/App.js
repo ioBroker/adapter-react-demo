@@ -24,11 +24,11 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 import withStyles from '@mui/styles/withStyles';
 
-import copy from 'copy-to-clipboard';
-import { withSnackbar } from 'notistack';
+import { enqueueSnackbar, SnackbarProvider } from 'notistack';
+
 
 import GenericApp from '@iobroker/adapter-react-v5/GenericApp';
-import I18n from '@iobroker/adapter-react-v5/i18n';
+import { I18n, Utils } from '@iobroker/adapter-react-v5';
 
 import ColorPicker from '@iobroker/adapter-react-v5/Components/ColorPicker';
 import ComplexCron from '@iobroker/adapter-react-v5/Components/ComplexCron';
@@ -1014,8 +1014,8 @@ class App extends GenericApp {
             <DialogActions>
                 <Button
                     onClick={() => {
-                        copy(this.state.example);
-                        this.props.enqueueSnackbar(I18n.t('Copied'));
+                        Utils.copyToClipboard(this.state.example);
+                        enqueueSnackbar(I18n.t('Copied'));
                     }}
                     variant="outlined"
                 >
@@ -1216,7 +1216,8 @@ class App extends GenericApp {
         }
 
         return <StyledEngineProvider injectFirst>
-            { this.renderCodeDialog() }
+            <SnackbarProvider />
+            {this.renderCodeDialog()}
             <ThemeProvider theme={this.state.theme}>
                 <div className={this.props.classes.app}>
                     <AppBar position="static">
@@ -1280,4 +1281,4 @@ class App extends GenericApp {
     }
 }
 
-export default withStyles(styles)(withSnackbar(App));
+export default withStyles(styles)(App);
