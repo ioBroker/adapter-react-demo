@@ -9,7 +9,7 @@
     "@mui/material": "^5.13.1",
     "@mui/styles": "^5.13.1",
     "@mui/x-date-pickers": "^6.4.0",
-    "ace-builds": "^1.21.1",
+    "ace-builds": "^1.22.0",
     "babel-eslint": "^10.1.0",
     "copy-to-clipboard": "^3.3.3",
     "eslint": "^8.40.0",
